@@ -26,7 +26,10 @@ repo directory so nothing breaks. The backup stays complete.
 
 - `fish`: `config.fish` sources `config-osx.fish` / `config-linux.fish` /
   `config-windows.fish`, then `config-local.fish` if present (machine-local,
-  ignored). Plugins are listed in `fish_plugins` and are not tracked: on a
+  ignored). Plugins are listed in `fish_plugins`, each pinned to a tag or
+  commit (`owner/repo@ref`); `fisher_outdated` shows which pins are behind
+  upstream, and an interactive shell runs it weekly in the background and
+  prints the result on the next start. Plugin files are not tracked: on a
   fresh machine the first interactive shell installs fisher (pinned), runs
   `fisher update`, applies `tide-settings.fish` and restarts. Needs `curl`
   and network.
@@ -132,7 +135,7 @@ Extra values in the palette file that are not in the base palette (used by tmux 
   end' > config/fish/tide-settings.fish
   ```
 
-- fisher-installed plugin files (tide, fzf.fish, z, nvm.fish, fisher): listed
+- fisher-installed plugin files (tide, fzf.fish, nvm.fish, fisher): listed
   in `.gitignore`, restored by `fisher update`.
 - Symlinks into other repos: carried across on first link; list them in
   `.git/info/exclude` to keep them out of `git status`.

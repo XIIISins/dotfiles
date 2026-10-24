@@ -21,6 +21,11 @@ if type -q nvim
     alias vim nvim
 end
 
+# zoxide (z, zi)
+if type -q zoxide
+    zoxide init fish | source
+end
+
 # Fzf
 if type -q bat
     set -g fzf_preview_file_cmd "bat --style=numbers --color=always --line-range :500"
