@@ -7,6 +7,8 @@ const usage = atom({ plugin: 'usage-band', key: 'usage' } as const, null)
 const branch = atom({ plugin: 'usage-band', key: 'branch' } as const, null)
 
 // TokyoNight Moon, copied from config/palette/tokyonight-moon.palette (a plugin can't read it at runtime; keep in sync by hand)
+const BG_DARK = '#1e2030'
+const BG_HIGHLIGHT = '#2f334d'
 const FG_GUTTER = '#3b4261'
 const FG_DARK = '#828bb8'
 const COMMENT = '#636da6'
@@ -14,25 +16,32 @@ const BLUE = '#82aaff'
 const YELLOW = '#ffc777'
 const RED = '#ff757f'
 
-// Powerline solid arrow closes the strip, the thin one divides gauges (tmux/statusline.conf)
+// Powerline solid arrows join the segments, which alternate backgrounds like the tmux statusline
 const BRANCH = ''
 const ARROW = ''
-const DIVIDER = ''
+const ARROW_LEFT = ''
+const SEGMENT_BG = [FG_GUTTER, BG_HIGHLIGHT]
 
 type Part = readonly [text: string, color: string]
 
+type Cell = { text: string; fg: string; bg?: string }
+
 const LABELS: Record<string, string> = { five_hour: '5h', seven_day: '7d', spend_limit: 'spend' }
 
-const shade = (percent: number) => (percent >= 90 ? RED : percent >= 70 ? YELLOW : BLUE)
+const WARN = 70
+const CRIT = 90
 
-const BAR = 10
+const shade = (percent: number) => (percent >= CRIT ? RED : percent >= WARN ? YELLOW : BLUE)
 
-const cells = (percent: number) => Math.min(BAR, Math.max(0, Math.round((percent / 100) * BAR)))
+const MIN_BAR = 3
+
+// all the bars together take at most this share of the terminal's width
+const MAX_SHARE = 1 / 3
+
+const cells = (percent: number, bar: number) => Math.min(bar, Math.max(0, Math.round((percent / 100) * bar)))
 
 // the number only earns its room once the bar is nearly full
 const pct = (percent: number) => (percent > 80 ? ` ${Math.round(percent)}%` : '')
-
-const compact = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(n >= 100000 ? 0 : 1)}k` : String(n))
 
 // "" outside a repo (git exits non-zero), "HEAD" when detached
 const branchName = (r: { exitCode: number; stdout: string }) => {
@@ -77,47 +86,70 @@ export const register: Register = on => {
 		}
 
 		const { Box, Text } = $.ui.resolve(e)
-		const tokens = u.tokens === null ? '--' : `${compact(u.tokens)}/${compact(u.window)}`
 
-		const gauge = (label: string, percent: number, extra = ''): Part[] => [
-			[`${label} `, FG_DARK],
-			['█'.repeat(cells(percent)), shade(percent)],
-			['░'.repeat(BAR - cells(percent)), COMMENT],
-			[pct(percent), shade(percent)],
-			[extra, FG_DARK],
-		]
-
-		const gauges = [
-			gauge('ctx', u.percent ?? 0, ` ${tokens}`),
-			...u.limits.map(l => gauge(LABELS[l.kind] ?? l.kind, l.percentUsed)),
-			...(u.usd === null ? [] : [[[`$${u.usd.toFixed(2)}`, FG_DARK]] as Part[]]),
-		]
-
-		const left: Part[] = gauges.flatMap((parts, i) => [
-			...(i === 0 ? [[' ', FG_DARK] as Part] : [[` ${DIVIDER} `, COMMENT] as Part]),
-			...parts,
-		]).concat([[' ', FG_DARK]])
-
-		// the branch sits at the right end, padded out to the arrow; skipped when it has no room
 		const head = await read($, branch)
-		const leftWidth = left.reduce((n, [text]) => n + text.length, 0)
-		const room = e.props.bodyColumns - leftWidth - 1 - 3
+
+		// the context is in the line below the band, and the 7d window and the cost only matter once the 7d window warns
+		const week = u.limits.find(l => l.kind === 'seven_day')
+		const quiet = week === undefined || week.percentUsed < WARN
+		const limits = u.limits.filter(l => l.kind !== 'seven_day' || !quiet)
+		const bars = Math.max(1, limits.length)
+
+		// every bar gets the same length: what the width leaves after the text and the branch, capped at its share
+		const build = (bar: number) => {
+			const gauge = (label: string, percent: number): Part[] => [
+				[`${label} `, FG_DARK],
+				['█'.repeat(cells(percent, bar)), shade(percent)],
+				['░'.repeat(bar - cells(percent, bar)), COMMENT],
+				[pct(percent), shade(percent)],
+			]
+
+			return [
+				...limits.map(l => gauge(LABELS[l.kind] ?? l.kind, l.percentUsed)),
+				...(u.usd === null || quiet ? [] : [[[`$${u.usd.toFixed(2)}`, FG_DARK]] as Part[]]),
+			]
+		}
+
+		const fixed = build(0).reduce((n, parts) => n + parts.reduce((m, [text]) => m + text.length, 0) + 3, 0)
+		const branchWidth = head === null ? 0 : Math.min(head.length, 20) + 6
+		const space = Math.floor((e.props.bodyColumns - fixed - branchWidth) / bars)
+		const bar = Math.max(MIN_BAR, Math.min(space, Math.floor((e.props.bodyColumns * MAX_SHARE) / bars)))
+		const gauges = build(bar)
+
+		if (gauges.length === 0 && head === null) {
+			return next(e)
+		}
+
+		const left: Cell[] = gauges.flatMap((parts, i) => {
+			const bg = SEGMENT_BG[i % 2]
+			const last = i === gauges.length - 1
+			return [
+				{ text: ' ', fg: FG_DARK, bg },
+				...parts.map(([text, fg]) => ({ text, fg, bg })),
+				{ text: ' ', fg: FG_DARK, bg },
+				{ text: ARROW, fg: bg, bg: last ? undefined : SEGMENT_BG[(i + 1) % 2] },
+			]
+		})
+
+		// the branch segment sits at the right end; skipped when it has no room
+		const leftWidth = left.reduce((n, { text }) => n + text.length, 0)
+		const room = e.props.bodyColumns - leftWidth - 5 - 1
 		const label = head === null ? '' : head.length > room ? `${head.slice(0, Math.max(0, room - 1))}…` : head
-		const right: Part[] = label === '' || room < 2
+		const right: Cell[] = label === '' || room < 2
 			? []
 			: [
-					[' '.repeat(e.props.bodyColumns - leftWidth - label.length - 3 - 1), FG_DARK],
-					[`${BRANCH} ${label} `, FG_DARK],
+					{ text: ' '.repeat(room - label.length + 1), fg: FG_DARK },
+					{ text: ARROW_LEFT, fg: BLUE },
+					{ text: ` ${BRANCH} ${label} `, fg: BG_DARK, bg: BLUE },
 				]
 
 		return (
 			<Box>
-				{[...left, ...right].map(([text, color], i) => (
-					<Text key={i} color={color} backgroundColor={FG_GUTTER}>
+				{[...left, ...right].map(({ text, fg, bg }, i) => (
+					<Text key={i} color={fg} backgroundColor={bg}>
 						{text}
 					</Text>
 				))}
-				<Text color={FG_GUTTER}>{ARROW}</Text>
 			</Box>
 		)
 	})
