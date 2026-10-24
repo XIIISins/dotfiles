@@ -16,22 +16,16 @@ dest=${XDG_CONFIG_HOME:-$HOME/.config}
 os=$(uname -s)
 dry=0
 
-packages="fish tmux ghostty hammerspoon karabiner nvim lazygit git palette claude-mods fastfetch"
+packages="shell tmux nvim git palette"
 
 # packages that only make sense on one OS (uname -s); empty means everywhere
 only_on() {
-    case $1 in
-        hammerspoon | karabiner) echo Darwin ;;
-        *) echo "" ;;
-    esac
+    echo ""
 }
 
 # machine-local paths (gitignored) carried over from the old directory on first link
 local_paths() {
     case $1 in
-        fish) echo "fish_variables config-local.fish" ;;
-        tmux) echo "plugins" ;;
-        karabiner) echo "automatic_backups" ;;
         git) echo "config.local" ;;
     esac
 }
@@ -64,20 +58,15 @@ hook() {
         return 0
     fi
     case $1 in
-        hammerspoon)
-            # Hammerspoon reads ~/.hammerspoon unless told otherwise
-            soft defaults write org.hammerspoon.Hammerspoon MJConfigFile "$dest/hammerspoon/init.lua"
-            ;;
-        claude-mods)
-            # plugins live in ~/.claude, not ~/.config: register the linked
-            # directory as a marketplace and install from it
-            if command -v claude >/dev/null 2>&1; then
-                soft claude plugin marketplace add "$dest/claude-mods"
-                soft claude plugin install usage-band@xiiisins-mods
-                soft claude plugin install tokyonight-moon@xiiisins-mods
-                soft claude plugin install todo@xiiisins-mods
+        shell)
+            # bash reads ~/.bashrc, not ~/.config: add one line that sources ours
+            rc=$HOME/.bashrc
+            line='. "${XDG_CONFIG_HOME:-$HOME/.config}/shell/bashrc"'
+            if [ -f "$rc" ] && grep -qF "$line" "$rc"; then
+                echo "shell: $rc already sources it"
             else
-                echo "claude-mods: claude not found; later run: claude plugin marketplace add $dest/claude-mods"
+                echo "shell: adding the source line to $rc"
+                run sh -c 'printf "%s\n" "$1" >> "$2"' sh "$line" "$rc"
             fi
             ;;
     esac

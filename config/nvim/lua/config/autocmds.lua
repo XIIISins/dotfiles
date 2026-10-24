@@ -4,15 +4,6 @@ vim.api.nvim_create_autocmd("InsertLeave", {
 	command = "set nopaste",
 })
 
--- Disable the concealing in some file formats
--- The default conceallevel is 3 in LazyVim
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = { "json", "jsonc", "markdown" },
-	callback = function()
-		vim.opt_local.conceallevel = 0
-	end,
-})
-
 -- Dim nvim while its tmux pane (or the terminal window) is unfocused. tmux can only dim cells with
 -- default colours, so blend every highlight colour toward the background on FocusLost and
 -- restore on FocusGained. Only in tmux, where focus events come from `focus-events on`.
@@ -32,7 +23,7 @@ if vim.env.TMUX then
 		if saved then
 			return
 		end
-		-- transparent colorschemes have no Normal bg; fall back to tokyonight moon
+		-- transparent colorschemes have no Normal bg; fall back to the moon bg
 		local bg = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg or 0x222436
 		saved = {}
 		for name, hl in pairs(vim.api.nvim_get_hl(0, {})) do
@@ -67,12 +58,3 @@ if vim.env.TMUX then
 	-- a new colorscheme replaces the saved colours
 	vim.api.nvim_create_autocmd("ColorSchemePre", { group = group, callback = restore })
 end
-
--- Tabline (replaces bufferline)
-require("config.tabline").setup()
-
--- Editor groups: a buffer list (winbar) per split
-require("config.groups").setup()
-
--- Sidebar: files, git status, commit graph
-require("config.sidebar").setup()

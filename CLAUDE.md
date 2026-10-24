@@ -1,184 +1,67 @@
 # CLAUDE.md
 
-Personal dotfiles. This file only adds rules for working in the repo;
-`README.md` is deliberately not imported, so read it (the relevant section
-only) when a task needs something that is only there:
-
-- **Theming** (TokyoNight Moon palette, per-tool theme setup, credits):
-  colors, theme or styling changes in any tool.
-- **Use** and **Layout** (install commands, package notes): installing,
-  linking, or changing how a package works.
-- **Not tracked, on purpose** (incl. the tide settings regeneration
-  command): adding files under `config/fish/`, or anything that might be
-  machine-local or generated.
-- **Adding a package**: creating a new `config/<name>/`.
+Server variant of my dotfiles (branch `server`): bash, tmux, nvim and git only, as minimal and
+static as possible. `main` has the full desktop setup; keep this branch a trimmed subset of it.
+`README.md` has the install commands and layout.
 
 ## Repo model
 
-- `config/` mirrors `~/.config`. `install.sh` symlinks each `config/<name>`
-  directory into `$XDG_CONFIG_HOME`, so editing a live config edits the
-  repo. Edit the files under `config/`; never copy files into `~/.config`.
-- Adding a package: create `config/<name>/`, add it to `packages` in
-  `install.sh` (plus `only_on` if OS-specific and `local_paths` if it has
-  machine-local files), and gitignore anything machine-local.
-- `hammerspoon` and `karabiner` are macOS only. Fish, tmux and nvim must keep
-  working on macOS, Linux, WSL and Windows, as the existing OS branches in
-  `config/fish/` and the tmux clipboard command do.
+- `config/` mirrors `~/.config`. `install.sh` symlinks each `config/<name>` directory into
+  `$XDG_CONFIG_HOME`, so editing a live config edits the repo. Edit the files under `config/`;
+  never copy files into `~/.config`.
+- Nothing may be fetched at runtime: no plugin managers, no `git clone` or `curl` from a config.
+  A feature that needs a plugin does not belong here.
+- Must work on old-ish Debian/Ubuntu servers: tmux 3.2+, nvim 0.10+, bash 5. Don't use newer
+  APIs without a fallback.
+- Adding a package: create `config/<name>/`, add it to `packages` in `install.sh` (plus
+  `local_paths` if it has machine-local files), and gitignore anything machine-local.
 
 ## Concurrent sessions
 
-- Several Claude sessions often run against this repo at once, and they share
-  one working tree. Before editing files, run `ListAgents`; if a session's
-  topic overlaps with the task, `SendMessage` it to ask what it is touching.
-- Uncommitted changes you did not make belong to another session: don't
-  stage, stash, revert or reformat them, and stage files by name instead of
-  `git add -A`.
-
-## Todo list
-
-- Ideas go in `~/.local/share/todo.md`, outside the repo so it is shared by
-  every session and worktree and never committed. If `TODO_FILE` is set
-  (`config/fish/config-local.fish`, which your shell may not load; check it
-  there), use that path instead. One line per item; create the file if it is
-  missing:
-
-  ```
-  - [ ] open
-  - [~] in progress (session-name)
-  - [x] done
-  ```
-
-- When the user says "todo: ..." or "idea: ...", append a `- [ ]` line and
-  carry on; don't start the work.
-- When starting a task, read the file. If an open item matches, mark it
-  `[~]` with your session name (as `ListAgents` shows it); skip items
-  already `[~]` unless the user says otherwise, and mark `[x]` once the
-  change is merged. Edit only the line you are changing; never delete or
-  reword the user's lines.
+- Several Claude sessions often run against this repo at once. Before editing, run `ListAgents`;
+  if a session's topic overlaps, `SendMessage` it.
+- Uncommitted changes you did not make belong to another session: don't stage, stash, revert or
+  reformat them, and stage files by name instead of `git add -A`.
+- `~/.config/<name>` on the dev Mac may symlink into a checkout of this repo, so never run
+  `rm -rf`, `git rm` or a branch switch in a checkout that is linked there; use a worktree.
 
 ## Testing and applying changes
 
-- Check linking with `./install.sh -n` (dry run) and `./install.sh status`.
-- Do not run `./install.sh` (without `-n`) unless asked: it moves existing
-  directories to `<name>.bak-<timestamp>`.
-- You cannot reload the user's live tmux, nvim or fish sessions. Say what
-  needs reloading (tmux: prefix + `r`; nvim: restart or `:Lazy reload`;
-  fish: new shell) rather than claiming a change is live.
-
-## Files that must not be committed
-
-- Machine-local or generated, already gitignored:
-  `config/fish/fish_variables`, `config/fish/config-local.fish`,
-  `config/git/config.local` (git identity and 1Password SSH signing),
-  `config/tmux/plugins/`, `config/karabiner/automatic_backups/`, and the
-  fisher-installed plugin files in `config/fish/` (completions, conf.d,
-  functions).
-- Check `.gitignore` before adding a new file under `config/fish/`, since
-  most of its `functions/` and `conf.d/` files are plugin-managed.
-- Never commit credentials or app state (`gh`, `op`, `1Password`, `rclone`,
-  `envman`, `raycast`, ...). Use `config.local` or 1Password instead.
+- Check linking with `./install.sh -n` and `./install.sh status`. Don't run `./install.sh`
+  without `-n` unless asked: it moves existing directories to `<name>.bak-<timestamp>`.
+- Test in isolation: a temp `HOME`/`XDG_CONFIG_HOME` with symlinks to `config/*`, `tmux -L <name>`
+  for a private socket, `nvim --headless`. Then on a canary host (homelab `canary-1..3`, user
+  `ansible`).
+- You cannot reload the user's live tmux or shells; say what needs reloading.
 
 ## Generated files
 
-- `config/fish/tide-settings.fish` holds the exported tide prompt settings.
-  After `tide configure`, regenerate it with the command in `README.md`
-  ("Not tracked, on purpose"); read that section first.
-- `config/palette/out/` is generated by `config/palette/render` from
-  `tokyonight-moon.palette` and the templates in `formats/`. Edit the palette
-  or a template, never `out/`; run `render --check` before committing.
-- `config/karabiner/karabiner.json` is rewritten by Karabiner itself; expect
-  small diffs and don't hand-clean them.
-- `config/nvim/lazy-lock.json` is committed; keep it in sync with plugin
-  changes.
+- `config/palette/out/` is generated by `config/palette/render` from `tokyonight-moon.palette`
+  and `formats/`. Edit the palette or a template, never `out/`; run `render --check` before
+  committing.
 
 ## Code style
 
-- Lua (nvim) is indented with tabs. The nvim config is LazyVim: custom plugin
-  specs go in `config/nvim/lua/plugins/`, other config in
+- Lua (nvim) is indented with tabs. Plain Neovim, no plugin manager: config lives in
   `config/nvim/lua/config/`.
-- Match the surrounding file's comment density and idiom. Config files here
-  carry short comments explaining *why* (see `config/tmux/theme.conf`).
+- Match the surrounding file's comment density and idiom. Config files carry short comments
+  explaining *why*.
+- Colours come from the palette: `${TN_*}` in tmux, `require("config.theme").colors()` in nvim.
+  Don't hardcode hex. Write icons as the literal glyph or the UTF-8 byte escape as in
+  `config/nvim/lua/config/tabline.lua`; Nerd Font glyphs, no emoji.
 
 ## Keybindings
 
-- tmux prefix is the backtick (`` ` ``, `bind '`' send-key '`'` types a
-  literal one). Splits, tabs and windows live in tmux, so
-  `config/ghostty/keybinds` unbinds Ghostty's own split/tab keys (cmd+t,
-  cmd+1-9, cmd+d, ...) to let them through.
-- Before adding a binding in any tool, check `config/tmux/tmux.conf`,
-  `config/ghostty/keybinds`, `config/nvim/lua/config/keymaps.lua` and
-  `config/hammerspoon/init.lua` for conflicts, and the Raycast list below.
-- Raycast hotkeys are not tracked in the repo (app state), so this list is
-  the only record. Raycast > Extensions > Window Management, all global:
-
-  | Action | Hotkey |
-  | --- | --- |
-  | Top Left Sixth | ⌥⇧Y |
-  | Top Center Sixth | ⌥⇧U |
-  | Top Right Sixth | ⌥⇧I |
-  | Bottom Left Sixth | ⌥⇧H |
-  | Bottom Center Sixth | ⌥⇧J |
-  | Bottom Right Sixth | ⌥⇧K |
-  | First Third | ⇧⌘H |
-  | Center Third | ⇧⌘J |
-  | Last Third | ⇧⌘K |
-  | First Two Thirds | ⌃⇧H |
-  | Last Two Thirds | ⌃⇧L |
-  | Maximize | ⇧⌘M |
-
-  Avoid ⌥⇧ + y/u/i/h/j/k, ⇧⌘ + h/j/k/m and ⌃⇧ + h/l in Ghostty, Hammerspoon
-  and Karabiner bindings.
+- tmux prefix is the backtick. Before adding a binding check `config/tmux/tmux.conf` and
+  `config/nvim/lua/config/keymaps.lua`, and keep them aligned with `main` where the tool exists
+  on both.
 
 ## Git
 
-- Branch names follow Conventional Commits types:
-  `<type>/<scope>_<description>`, e.g. `feat/nvim_new-feature-1`.
-- Commit messages follow Conventional Commits and do not include a
-  `Co-Authored-By` trailer.
-- Before every commit, stage the changes and run
-  `gitleaks git --staged --no-banner --redact -v`. Do not commit if it
-  reports a leak; remove the secret (and tell the user if it was already
-  committed or pushed) instead of allowlisting it.
-- Shipping a change (when asked) goes through a PR, never a direct push to
-  `main`. Automerge is off, so merge by hand:
-  1. Commit on a type-prefixed branch (gitleaks check first).
-  2. Push it (`git push -u origin <branch>`).
-  3. Open the PR against `main` (`gh pr create`). The body is a short
-     summary only: no test plan section (changes are tested locally) and no
-     "Generated with Claude Code" trailer.
-  4. Merge the PR (`gh pr merge <n> --merge`).
-  5. Clean up: switch to `main`, pull, then delete the branch locally
-     (`git branch -d`) and on the remote (`git push origin --delete`).
-
-## Theming
-
-Everything uses TokyoNight Moon. Before choosing or changing any color, read
-the "Theming" section of `README.md` for the palette and use those hex values
-instead of looking colors up. Keep new tmux colors within that palette, as `${TN_*}` variables rather than hex (see `README.md` Theming).
-
-## Glyphs and icons
-
-- Terminal font is **Hack Nerd Font Mono** (size 12), set in
-  `config/ghostty/config`. It is the Nerd Font patched Hack, so Nerd Font
-  glyphs (Powerline, Font Awesome, Material Design, Devicons) render in every
-  tool.
-- Write icons as the literal glyph character, not an escape or image. Look up
-  codepoints at nerdfonts.com/cheat-sheet if needed. Don't use emoji; they
-  ignore the palette colors and the Mono font's cell width.
-- Codepoint ranges: Powerline `U+E0A0`-`U+E0D7`, Material Design `U+F0001`+
-  (supplementary private use area, e.g. `U+F033E`), the rest of the Nerd Font
-  set in `U+E000`-`U+F8FF`. Beware that tools that strip or mangle
-  private-use characters will silently break these.
-- Color glyphs with the palette (see `README.md` Theming), usually fg on the
-  segment background.
-
-Where they are used today:
-
-- tmux (`config/tmux/statusline.conf`): Powerline arrows `U+E0B0` (left,
-  solid) and `U+E0B2` (right, solid) form the segment separators; pair the
-  arrow's fg with the previous segment's bg and its bg with the next one's.
-- nvim: `readonly_icon` in `config/nvim/lua/plugins/ui.lua` uses `U+F033E`
-  (lock). `nvim-web-devicons` supplies file icons for the sidebar plugin.
-- fish: the tide prompt icons (language, git, pwd, etc.) and separators live
-  in `config/fish/tide-settings.fish`. Edit it via `tide configure` or by
-  hand, keeping the glyphs literal.
+- Branch names follow Conventional Commits types: `<type>/<scope>_<description>`.
+- Commit messages follow Conventional Commits and do not include a `Co-Authored-By` trailer.
+- Before every commit, stage the changes and run `gitleaks git --staged --no-banner --redact -v`.
+  Do not commit if it reports a leak.
+- Never commit credentials or app state. Use `config.local` instead.
+- Shipping goes through a PR against `server`, never a direct push. Automerge is off, so merge
+  by hand, then delete the branch locally and on the remote.

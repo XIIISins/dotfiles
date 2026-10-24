@@ -6,7 +6,7 @@ local arrow = "\238\130\176" -- U+E0B0
 local divider = "\238\130\177" -- U+E0B1, lualine's component separator
 
 local function set_highlights()
-	local c = require("tokyonight.colors").setup({ style = "moon" })
+	local c = require("config.theme").colors()
 	local hl = vim.api.nvim_set_hl
 	hl(0, "TabLineFill", { bg = c.bg_dark })
 	hl(0, "TabInactive", { fg = c.fg_dark, bg = c.bg_dark })

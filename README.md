@@ -1,155 +1,52 @@
-# dotfiles
+# dotfiles (server branch)
 
-Configs for fish, tmux, Ghostty, Hammerspoon, Karabiner, Neovim, lazygit and
-git. Everything lives in `config/`, which mirrors `~/.config`; `install.sh`
-symlinks each directory into place, so editing a config edits the repo.
+The minimal, static variant of the dotfiles for servers: bash, tmux, Neovim and git, in the
+TokyoNight Moon palette. Nothing is fetched at runtime (no plugin manager, no tpm, no fisher), so
+a host needs only the packages below. The full desktop setup lives on `main`; this branch is
+cut from it and meant to be merged from `main` now and then.
+
+Needs `bash`, `git`, `tmux` 3.2+ and `nvim` 0.10+ (Debian 13 ships tmux 3.5a and nvim 0.10.4).
 
 ## Use
 
 ```sh
+git clone -b server https://github.com/XIIISins/dotfiles.git ~/dotfiles
+cd ~/dotfiles
 ./install.sh -n          # dry run: shows what would be backed up and linked
 ./install.sh             # link everything (existing dirs are backed up)
 ./install.sh status      # what is linked
-./install.sh link tmux   # one package only
-./install.sh hooks       # re-run post-link steps (Hammerspoon path, Claude plugins)
-./install.sh unlink fish # replace the symlink with a real copy of the files
+./install.sh hooks       # re-run post-link steps (the ~/.bashrc source line)
+./install.sh unlink tmux # replace the symlink with a real copy of the files
 ```
 
-Existing directories are moved to `<name>.bak-<timestamp>`.
-
-`hammerspoon` and `karabiner` are skipped outside macOS. On first link,
-machine-local files that are gitignored (fish_variables, tmux plugins,
-symlinks into other repos, ...) are copied from the old directory into the
-repo directory so nothing breaks. The backup stays complete.
+Existing directories are moved to `<name>.bak-<timestamp>`. Each `config/<name>` is symlinked
+into `$XDG_CONFIG_HOME` (default `~/.config`), so editing a live config edits the repo.
 
 ## Layout
 
-- `fish`: `config.fish` sources `config-osx.fish` / `config-linux.fish` /
-  `config-windows.fish`, then `config-local.fish` if present (machine-local,
-  ignored). Plugins are listed in `fish_plugins`, each pinned to a tag or
-  commit (`owner/repo@ref`); `fisher_outdated` shows which pins are behind
-  upstream, and an interactive shell runs it weekly in the background and
-  prints the result on the next start. Plugin files are not tracked: on a
-  fresh machine the first interactive shell installs fisher (pinned), runs
-  `fisher update`, applies `tide-settings.fish` and restarts. Needs `curl`
-  and network.
-- `tmux`: plugins are installed by tpm; `tmux.conf` clones tpm and installs
-  them on a fresh machine (needs git). `notify.sh` is the notch-style
-  notification popup.
-- `palette`: the TokyoNight Moon colours as data (`tokyonight-moon.palette`)
-  plus `render`, a POSIX sh/awk script that turns it into each tool's format
-  using the templates in `formats/` (fish, tmux, sh, css). The output in
-  `out/` is committed, so nothing needs `render` at runtime. After editing the
-  palette or a template, run `config/palette/render`; `render --check` fails
-  if `out/` is stale. To support another tool, add `formats/<name>.tmpl`
-  (header comment in `render` explains the format).
-- `ghostty`: `keybinds` is pulled in from `config` and unbinds Ghostty's
-  split/tab keys.
-- `hammerspoon`: window focus and the Cmd+Return swallow. `install.sh` points
-  Hammerspoon at this directory.
-- `karabiner`: Caps Lock to Ctrl and the Aero 75 device entry. Karabiner
-  rewrites `karabiner.json` itself, so expect small diffs.
-- `git`: aliases only. Identity and 1Password SSH signing live in
-  `config.local` (untracked, copied across on first link); see
+- `shell`: `bashrc`, sourced from `~/.bashrc` by `install.sh` (one appended line). History,
+  PATH, aliases, `EDITOR`, and a prompt with the git branch in the palette colours.
+- `tmux`: the same keys as on `main` (backtick prefix, vim pane keys, resize mode), without
+  plugins, popups or clipboard tools. Yanks go through OSC 52 to the terminal you ssh from.
+- `nvim`: no plugins. Options and keymaps as on `main`, built-in syntax highlighting (yaml, shell
+  and python get indent and dialect settings in `config/filetypes.lua`), and small Lua versions of
+  the sidebar (`<leader>e`, files only), buffer groups, tabline and statusline.
+- `git`: aliases only. Identity and signing live in `config.local` (untracked), see
   `config.local.example`.
-- `claude-mods`: a local Claude Code plugin marketplace (`xiiisins-mods`).
-  Claude Code keeps plugins in `~/.claude`, so linking this package also
-  runs `claude plugin marketplace add` and `claude plugin install` for it
-  (needs `claude` on the PATH, and a fresh link; otherwise run the same two
-  commands by hand). `usage-band` draws context, rate-limit and cost bars
-  above the prompt in the palette colours. The installed copy is a snapshot:
-  after editing, `claude plugin update usage-band@xiiisins-mods` and restart.
-  `usage-band/.claude-plugin/types/` (what `tsconfig.json` extends) is written by
-  Claude Code and gitignores itself, so typechecking works only where Claude Code
-  has generated it.
-- `fastfetch`: `config.jsonc` with a one-colour logo in the palette blue and
-  a trimmed module list (no kernel, display, font, cursor, IP, power adapter,
-  window manager or locale). Terminal names the real terminal app even inside
-  tmux, and Theme is the Ghostty theme.
-- `nvim`, `lazygit`: plain configs.
+- `palette`: the colours as data (`tokyonight-moon.palette`) and `render`, which writes
+  `out/` for tmux, sh and Lua. Edit the palette, run `config/palette/render`, never edit `out/`.
+  `render --check` fails if `out/` is stale.
 
 ## Theming
 
-Everything uses **TokyoNight Moon** so tools match.
-
-Credits: [Tokyo Night][tokyo-night] was created by enkia. The Moon variant
-(one of the `night`, `storm`, `moon` and `day` styles) comes from
-[folke/tokyonight.nvim][tokyonight-nvim] by Folke Lemaitre, whose extras also
-supply the Ghostty theme.
+TokyoNight Moon (credits: [Tokyo Night][tokyo-night] by enkia, the Moon variant from
+[folke/tokyonight.nvim][tokyonight-nvim]). tmux and the prompt read `palette/out/`; nvim sets
+its own highlight groups from `palette/out/tokyonight-moon.lua` in `config/theme.lua`.
 
 [tokyo-night]: https://github.com/enkia/tokyo-night-vscode-theme
 [tokyonight-nvim]: https://github.com/folke/tokyonight.nvim
 
-- ghostty: `theme = "TokyoNight Moon"` (`config/ghostty/config`)
-- nvim: `folke/tokyonight.nvim`, `style = "moon"`, transparent so the ghostty
-  background shows through (`config/nvim/lua/plugins/colorscheme.lua`). In
-  Lua, get colors from `require("tokyonight.colors").setup({ style = "moon" })`
-  rather than hardcoding hex (see `config/nvim/lua/config/tabline.lua`,
-  `sidebar.lua`).
-- tmux: `theme.conf` and `statusline.conf` use `${TN_*}` variables (`${TN_BLUE}`,
-  `${TN_BG_DARK}`, ...) from `palette/out/tokyonight-moon.tmux`, which
-  `tmux.conf` sources first. tmux only expands them in double-quoted strings
-  of files sourced after the palette, so new colours go in those files, not
-  in `tmux.conf` itself. `notify.sh` reads `palette/out/tokyonight-moon.sh`
-  (`$TN_BG`, `$TN_BG_RGB`, ...). Needs tmux 3.2+ (`%hidden`).
-- fish (tide, Rainbow style): `config/fish/conf.d/tide_theme.fish` sets the
-  `tide_*` colours as globals from `palette/out/tokyonight-moon.fish`. They
-  override the stock values in `tide-settings.fish`, so `tide configure` plus
-  regenerating that file does not undo the theme.
-
-The palette table below mirrors `config/palette/tokyonight-moon.palette`,
-which is the source of truth.
-
-### Palette
-
-| Name         | Hex       | Typical use                     |
-| ------------ | --------- | ------------------------------- |
-| bg           | `#222436` | main background                 |
-| bg_dark      | `#1e2030` | status bar, sidebars            |
-| bg_highlight | `#2f334d` | pane borders, subtle highlight  |
-| fg           | `#c8d3f5` | main text                       |
-| fg_dark      | `#828bb8` | status text, inactive items     |
-| comment      | `#636da6` | comments, muted text            |
-| blue         | `#82aaff` | primary accent, active border   |
-| cyan         | `#86e1fc` | window index                    |
-| green        | `#c3e88d` |                                 |
-| magenta      | `#c099ff` |                                 |
-| orange       | `#ff966c` | resize mode, active pane number |
-| red          | `#ff757f` |                                 |
-| yellow       | `#ffc777` |                                 |
-
-Extra values in the palette file that are not in the base palette (used by tmux and fzf):
-
-| Hex       | Use                                                |
-| --------- | -------------------------------------------------- |
-| `#3b4261` | status segment background (tokyonight `fg_gutter`) |
-| `#2d3f76` | copy-mode selection background                     |
-| `#6c77a6` | dimmed text of inactive panes                      |
-| `#000000` | message "notch" background                         |
-
 ## Not tracked, on purpose
 
-- `fish/fish_variables`: universal variables, including tide's prompt
-  caches. The tide settings are exported to `fish/tide-settings.fish`; after
-  changing the prompt with `tide configure`, regenerate it:
-
-  ```sh
-  fish -c 'for v in (set -U --names | string match -r "^tide_\\S+" | sort)
-    echo set -U $v (string escape -- $$v)
-  end' > config/fish/tide-settings.fish
-  ```
-
-- fisher-installed plugin files (tide, fzf.fish, nvm.fish, fisher): listed
-  in `.gitignore`, restored by `fisher update`.
-- Symlinks into other repos: carried across on first link; list them in
-  `.git/info/exclude` to keep them out of `git status`.
-- `tmux/plugins/`, `karabiner/automatic_backups/`: third-party or generated.
-- Anything with credentials or app state (`gh`, `op`, `1Password`, `rclone`,
-  `envman`, `raycast`, ...).
-
-## Adding a package
-
-1. Copy it to `config/<name>/` and add anything machine-local to
-   `.gitignore`.
-2. Add the name to `packages` in `install.sh`. If it is OS-specific, add it
-   to `only_on`; if it has machine-local files, add them to `local_paths`.
+- `git/config.local`: identity and signing, per machine.
+- Anything with credentials or app state.

@@ -8,7 +8,7 @@ local group = vim.api.nvim_create_augroup("groups", { clear = true })
 local arrow = "\238\130\176" -- U+E0B0
 
 local function set_highlights()
-	local c = require("tokyonight.colors").setup({ style = "moon" })
+	local c = require("config.theme").colors()
 	local hl = vim.api.nvim_set_hl
 	hl(0, "WinBar", { bg = c.bg_dark })
 	hl(0, "WinBarNC", { bg = c.bg_dark })
@@ -17,7 +17,7 @@ local function set_highlights()
 	hl(0, "GroupInactive", { fg = c.fg_dark, bg = c.bg_dark })
 end
 
--- sidebar and tool windows (neo-tree, graph, help, terminals) are not groups
+-- sidebar and tool windows (help, terminals) are not groups
 local function eligible(buf)
 	return vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buftype == "" and vim.bo[buf].buflisted
 end
