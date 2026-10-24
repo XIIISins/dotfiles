@@ -68,6 +68,7 @@ hook() {
             if command -v claude >/dev/null 2>&1; then
                 run claude plugin marketplace add "$dest/claude-mods"
                 run claude plugin install usage-band@xiiisins-mods
+                run claude plugin install tokyonight-moon@xiiisins-mods
             else
                 echo "claude-mods: claude not found; later run: claude plugin marketplace add $dest/claude-mods"
             fi

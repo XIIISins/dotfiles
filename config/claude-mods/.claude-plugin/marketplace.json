@@ -1,11 +1,18 @@
 {
   "name": "xiiisins-mods",
-  "owner": { "name": "XIIISins" },
+  "owner": {
+    "name": "XIIISins"
+  },
   "plugins": [
     {
       "name": "usage-band",
       "source": "./usage-band",
       "description": "Context tokens, rate-limit windows and session cost as bars above the prompt"
+    },
+    {
+      "name": "tokyonight-moon",
+      "source": "./tokyonight-moon",
+      "description": "TokyoNight Moon color theme"
     }
   ]
 }
