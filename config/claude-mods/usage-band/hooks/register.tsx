@@ -6,11 +6,18 @@ import type { Usage } from '../types'
 const usage = atom({ plugin: 'usage-band', key: 'usage' } as const, null)
 
 // TokyoNight Moon
+const FG_GUTTER = '#3b4261'
 const FG_DARK = '#828bb8'
 const COMMENT = '#636da6'
 const BLUE = '#82aaff'
 const YELLOW = '#ffc777'
 const RED = '#ff757f'
+
+// Powerline solid arrow closes the strip, the thin one divides gauges (tmux/statusline.conf)
+const ARROW = ''
+const DIVIDER = ''
+
+type Part = readonly [text: string, color: string]
 
 const LABELS: Record<string, string> = { five_hour: '5h', seven_day: '7d', spend_limit: 'spend' }
 
@@ -25,6 +32,12 @@ const pct = (percent: number) => (percent > 80 ? ` ${Math.round(percent)}%` : ''
 
 const compact = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(n >= 100000 ? 0 : 1)}k` : String(n))
 
+// "" outside a repo (git exits non-zero), "HEAD" when detached
+const branchLine = (r: { exitCode: number; stdout: string }) => {
+	const name = r.stdout.trim()
+	return r.exitCode === 0 && name !== '' ? ` ${name}` : undefined
+}
+
 const toUsage = ({ context, rateLimits, cost }: Pick<SessionUsage, 'context' | 'rateLimits' | 'cost'>): Usage => ({
 	tokens: context.tokens ?? null,
 	window: context.window,
@@ -37,6 +50,12 @@ export const register: Register = on => {
 	on('session.start', async ($, e, next) => {
 		const current = toUsage(await $.session.usage())
 		await update($, usage, () => current)
+		$.ui.status(branchLine(await $.process.run(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])))
+		return next(e)
+	})
+
+	on('turn.complete', async ($, e, next) => {
+		$.ui.status(branchLine(await $.process.run(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])))
 		return next(e)
 	})
 
@@ -55,23 +74,32 @@ export const register: Register = on => {
 
 		const { Box, Text } = $.ui.resolve(e)
 		const tokens = u.tokens === null ? '--' : `${compact(u.tokens)}/${compact(u.window)}`
-		const ctx = u.percent ?? 0
 
-		const gauge = (key: string, label: string, percent: number) => (
-			<Text key={key}>
-				<Text color={FG_DARK}>{label}</Text>
-				<Text color={shade(percent)}>{'█'.repeat(cells(percent))}</Text>
-				<Text color={COMMENT}>{'░'.repeat(BAR - cells(percent))}</Text>
-				<Text color={shade(percent)}>{pct(percent)}</Text>
-			</Text>
-		)
+		const gauge = (label: string, percent: number, extra = ''): Part[] => [
+			[`${label} `, FG_DARK],
+			['█'.repeat(cells(percent)), shade(percent)],
+			['░'.repeat(BAR - cells(percent)), COMMENT],
+			[pct(percent), shade(percent)],
+			[extra, FG_DARK],
+		]
+
+		const gauges = [
+			gauge('ctx', u.percent ?? 0, ` ${tokens}`),
+			...u.limits.map(l => gauge(LABELS[l.kind] ?? l.kind, l.percentUsed)),
+			...(u.usd === null ? [] : [[[`$${u.usd.toFixed(2)}`, FG_DARK]] as Part[]]),
+		]
 
 		return (
 			<Box>
-				{gauge('ctx', 'ctx ', ctx)}
-				<Text color={FG_DARK}>{` ${tokens}`}</Text>
-				{u.limits.map(l => gauge(l.kind, `  ${LABELS[l.kind] ?? l.kind} `, l.percentUsed))}
-				{u.usd === null ? null : <Text color={FG_DARK}>{`  $${u.usd.toFixed(2)}`}</Text>}
+				{gauges.flatMap((parts, i) => [
+					...(i === 0 ? [[' ', FG_DARK] as Part] : [[` ${DIVIDER} `, COMMENT] as Part]),
+					...parts,
+				]).concat([[' ', FG_DARK]]).map(([text, color], i) => (
+					<Text key={i} color={color} backgroundColor={FG_GUTTER}>
+						{text}
+					</Text>
+				))}
+				<Text color={FG_GUTTER}>{ARROW}</Text>
 			</Box>
 		)
 	})
