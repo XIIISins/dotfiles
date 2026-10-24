@@ -95,10 +95,33 @@ return {
 		keys = { { "<leader>z", "<cmd>ZenMode<cr>", desc = "Zen Mode" } },
 	},
 
+	-- Markdown is rendered in the buffer (headings, tables, code, checkboxes); only the cursor line shows
+	-- raw syntax. render_modes keeps it rendered in insert mode too, which makes editing near-WYSIWYG.
 	{
 		"MeanderingProgrammer/render-markdown.nvim",
-		enabled = false,
+		opts = function(_, opts)
+			-- underlined, bold headings in palette colours: a terminal can't size text, so this is what
+			-- marks a heading as one
+			local function set_heading_hl()
+				local c = require("tokyonight.colors").setup({ style = "moon" })
+				local palette = { c.blue, c.magenta, c.cyan, c.green, c.yellow, c.orange }
+				for i, fg in ipairs(palette) do
+					vim.api.nvim_set_hl(0, "MarkdownHeading" .. i, { fg = fg, bold = true, underline = true })
+				end
+			end
+			set_heading_hl()
+			vim.api.nvim_create_autocmd("ColorScheme", { callback = set_heading_hl })
+
+			opts.render_modes = true
+			-- no level icons: the # signs stay, which reads better than a glyph
+			opts.heading = { icons = {}, sign = false, foregrounds = {} }
+			for i = 1, 6 do
+				opts.heading.foregrounds[i] = "MarkdownHeading" .. i
+			end
+		end,
 	},
+	-- the browser preview is replaced by the in-buffer rendering
+	{ "iamcco/markdown-preview.nvim", enabled = false },
 
 	{
 		"folke/snacks.nvim",
