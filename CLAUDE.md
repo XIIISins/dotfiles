@@ -73,7 +73,27 @@ only) when a task needs something that is only there:
   cmd+1-9, cmd+d, ...) to let them through.
 - Before adding a binding in any tool, check `config/tmux/tmux.conf`,
   `config/ghostty/keybinds`, `config/nvim/lua/config/keymaps.lua` and
-  `config/hammerspoon/init.lua` for conflicts.
+  `config/hammerspoon/init.lua` for conflicts, and the Raycast list below.
+- Raycast hotkeys are not tracked in the repo (app state), so this list is
+  the only record. Raycast > Extensions > Window Management, all global:
+
+  | Action | Hotkey |
+  | --- | --- |
+  | Top Left Sixth | ⌥⇧Y |
+  | Top Center Sixth | ⌥⇧U |
+  | Top Right Sixth | ⌥⇧I |
+  | Bottom Left Sixth | ⌥⇧H |
+  | Bottom Center Sixth | ⌥⇧J |
+  | Bottom Right Sixth | ⌥⇧K |
+  | First Third | ⇧⌘H |
+  | Center Third | ⇧⌘J |
+  | Last Third | ⇧⌘K |
+  | First Two Thirds | ⌃⇧H |
+  | Last Two Thirds | ⌃⇧L |
+  | Maximize | ⇧⌘M |
+
+  Avoid ⌥⇧ + y/u/i/h/j/k, ⇧⌘ + h/j/k/m and ⌃⇧ + h/l in Ghostty, Hammerspoon
+  and Karabiner bindings.
 
 ## Git
 

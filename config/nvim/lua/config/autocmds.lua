@@ -71,5 +71,8 @@ end
 -- Tabline (replaces bufferline)
 require("config.tabline").setup()
 
+-- Editor groups: a buffer list (winbar) per split
+require("config.groups").setup()
+
 -- Sidebar: files, git status, commit graph
 require("config.sidebar").setup()
