@@ -63,8 +63,9 @@ repo directory so nothing breaks. The backup stays complete.
   Claude Code and gitignores itself, so typechecking works only where Claude Code
   has generated it.
 - `fastfetch`: `config.jsonc` with a one-colour logo in the palette blue and
-  a trimmed module list (no kernel, display, font, cursor, IP or power
-  adapter).
+  a trimmed module list (no kernel, display, font, cursor, IP, power adapter,
+  window manager or locale). Terminal names the real terminal app even inside
+  tmux, and Theme is the Ghostty theme.
 - `nvim`, `lazygit`: plain configs.
 
 ## Theming
