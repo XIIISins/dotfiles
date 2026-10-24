@@ -4,6 +4,18 @@ function todo
   set -l file (set -q XDG_DATA_HOME; and echo $XDG_DATA_HOME; or echo $HOME/.local/share)/todo.md
   set -q TODO_FILE; and set file $TODO_FILE
 
+  # exactly one flag-ish argument, so `todo help the user` is still an item
+  if test (count $argv) -eq 1; and contains -- $argv[1] help -h --help
+    echo "usage: todo                list the items, numbered
+       todo <text>         add an open item
+       todo rm <N>         delete item N
+       todo archive        move done items to todo-done.md
+       todo help           show this help
+
+list: $file (override with TODO_FILE in config-local.fish)"
+    return
+  end
+
   # no arguments: show the list (numbered, for `todo rm`) instead of appending an empty item
   if test (count $argv) -eq 0
     test -f $file; and cat -n $file; or echo "todo: nothing yet"
