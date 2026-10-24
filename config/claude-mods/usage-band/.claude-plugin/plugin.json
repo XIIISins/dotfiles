@@ -1,1 +1,1 @@
-{ "name": "usage-band", "version": "0.3.1", "description": "Context tokens, rate-limit windows and session cost above the prompt, and the git branch in the status line", "types": "./types/index.d.ts" }
+{ "name": "usage-band", "version": "0.4.0", "description": "Context tokens, rate-limit windows and session cost above the prompt, and the git branch right-justified in the same band", "types": "./types/index.d.ts" }
