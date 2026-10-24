@@ -1,0 +1,120 @@
+# CLAUDE.md
+
+Personal dotfiles. This file only adds rules for working in the repo;
+`README.md` is deliberately not imported, so read it (the relevant section
+only) when a task needs something that is only there:
+
+- **Theming** (TokyoNight Moon palette, per-tool theme setup, credits):
+  colors, theme or styling changes in any tool.
+- **Use** and **Layout** (install commands, package notes): installing,
+  linking, or changing how a package works.
+- **Not tracked, on purpose** (incl. the tide settings regeneration
+  command): adding files under `config/fish/`, or anything that might be
+  machine-local or generated.
+- **Adding a package**: creating a new `config/<name>/`.
+
+## Repo model
+
+- `config/` mirrors `~/.config`. `install.sh` symlinks each `config/<name>`
+  directory into `$XDG_CONFIG_HOME`, so editing a live config edits the
+  repo. Edit the files under `config/`; never copy files into `~/.config`.
+- Adding a package: create `config/<name>/`, add it to `packages` in
+  `install.sh` (plus `only_on` if OS-specific and `local_paths` if it has
+  machine-local files), and gitignore anything machine-local.
+- `hammerspoon` and `karabiner` are macOS only. Fish, tmux and nvim must keep
+  working on macOS, Linux, WSL and Windows, as the existing OS branches in
+  `config/fish/` and the tmux clipboard command do.
+
+## Testing and applying changes
+
+- Check linking with `./install.sh -n` (dry run) and `./install.sh status`.
+- Do not run `./install.sh` (without `-n`) unless asked: it moves existing
+  directories to `<name>.bak-<timestamp>`.
+- You cannot reload the user's live tmux, nvim or fish sessions. Say what
+  needs reloading (tmux: prefix + `r`; nvim: restart or `:Lazy reload`;
+  fish: new shell) rather than claiming a change is live.
+
+## Files that must not be committed
+
+- Machine-local or generated, already gitignored:
+  `config/fish/fish_variables`, `config/fish/config-local.fish`,
+  `config/git/config.local` (git identity and 1Password SSH signing),
+  `config/tmux/plugins/`, `config/karabiner/automatic_backups/`, and the
+  fisher-installed plugin files in `config/fish/` (completions, conf.d,
+  functions).
+- Check `.gitignore` before adding a new file under `config/fish/`, since
+  most of its `functions/` and `conf.d/` files are plugin-managed.
+- Never commit credentials or app state (`gh`, `op`, `1Password`, `rclone`,
+  `envman`, `raycast`, ...). Use `config.local` or 1Password instead.
+
+## Generated files
+
+- `config/fish/tide-settings.fish` holds the exported tide prompt settings.
+  After `tide configure`, regenerate it with the command in `README.md`
+  ("Not tracked, on purpose"); read that section first.
+- `config/karabiner/karabiner.json` is rewritten by Karabiner itself; expect
+  small diffs and don't hand-clean them.
+- `config/nvim/lazy-lock.json` is committed; keep it in sync with plugin
+  changes.
+
+## Code style
+
+- Lua (nvim) is indented with tabs. The nvim config is LazyVim: custom plugin
+  specs go in `config/nvim/lua/plugins/`, other config in
+  `config/nvim/lua/config/`.
+- Match the surrounding file's comment density and idiom. Config files here
+  carry short comments explaining *why* (see `config/tmux/theme.conf`).
+
+## Keybindings
+
+- tmux prefix is the backtick (`` ` ``, `bind '`' send-key '`'` types a
+  literal one). Splits, tabs and windows live in tmux, so
+  `config/ghostty/keybinds` unbinds Ghostty's own split/tab keys (cmd+t,
+  cmd+1-9, cmd+d, ...) to let them through.
+- Before adding a binding in any tool, check `config/tmux/tmux.conf`,
+  `config/ghostty/keybinds`, `config/nvim/lua/config/keymaps.lua` and
+  `config/hammerspoon/init.lua` for conflicts.
+
+## Git
+
+- Branch names follow Conventional Commits types:
+  `<type>/<scope>_<description>`, e.g. `feat/nvim_new-feature-1`.
+- Commit messages follow Conventional Commits and do not include a
+  `Co-Authored-By` trailer.
+- Before every commit, stage the changes and run
+  `gitleaks git --staged --no-banner --redact -v`. Do not commit if it
+  reports a leak; remove the secret (and tell the user if it was already
+  committed or pushed) instead of allowlisting it.
+
+## Theming
+
+Everything uses TokyoNight Moon. Before choosing or changing any color, read
+the "Theming" section of `README.md` for the palette and use those hex values
+instead of looking colors up. Keep new tmux colors within that palette.
+
+## Glyphs and icons
+
+- Terminal font is **Hack Nerd Font Mono** (size 12), set in
+  `config/ghostty/config`. It is the Nerd Font patched Hack, so Nerd Font
+  glyphs (Powerline, Font Awesome, Material Design, Devicons) render in every
+  tool.
+- Write icons as the literal glyph character, not an escape or image. Look up
+  codepoints at nerdfonts.com/cheat-sheet if needed. Don't use emoji; they
+  ignore the palette colors and the Mono font's cell width.
+- Codepoint ranges: Powerline `U+E0A0`-`U+E0D7`, Material Design `U+F0001`+
+  (supplementary private use area, e.g. `U+F033E`), the rest of the Nerd Font
+  set in `U+E000`-`U+F8FF`. Beware that tools that strip or mangle
+  private-use characters will silently break these.
+- Color glyphs with the palette (see `README.md` Theming), usually fg on the
+  segment background.
+
+Where they are used today:
+
+- tmux (`config/tmux/statusline.conf`): Powerline arrows `U+E0B0` (left,
+  solid) and `U+E0B2` (right, solid) form the segment separators; pair the
+  arrow's fg with the previous segment's bg and its bg with the next one's.
+- nvim: `readonly_icon` in `config/nvim/lua/plugins/ui.lua` uses `U+F033E`
+  (lock). `nvim-web-devicons` supplies file icons for the sidebar plugin.
+- fish: the tide prompt icons (language, git, pwd, etc.) and separators live
+  in `config/fish/tide-settings.fish`. Edit it via `tide configure` or by
+  hand, keeping the glyphs literal.
