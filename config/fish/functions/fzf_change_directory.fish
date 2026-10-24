@@ -12,11 +12,7 @@ function fzf_change_directory
     end
   end | awk '!a[$0]++' | fzf $argv)
 
-  if test -n "$dir"
-    builtin cd -- $dir
-    commandline -r ''
-  else
-    commandline ''
-  end
+  # keep what was typed: cancelling must not wipe the command line
+  test -n "$dir"; and builtin cd -- $dir
   commandline -f repaint
 end

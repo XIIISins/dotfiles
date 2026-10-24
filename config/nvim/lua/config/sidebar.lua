@@ -6,6 +6,7 @@ local M = {}
 M.enabled = false
 local tabs = {} -- tabpage handle -> { files = win, git = win, graph = win }
 local closing = false
+local graph_timer -- debounces graph redraws, created on first open
 local group = vim.api.nvim_create_augroup("sidebar", { clear = true })
 
 local function valid(win)
@@ -155,6 +156,9 @@ end
 
 function M.close()
 	M.enabled = false
+	if graph_timer then
+		graph_timer:stop()
+	end
 	for tab in pairs(tabs) do
 		close_tab(tab)
 	end
@@ -195,15 +199,22 @@ function M.open()
 		end,
 	})
 
-	-- the graph is static: redraw when something may have changed
+	-- the graph is static: redraw when something may have changed. Debounced, since the redraw runs
+	-- git log synchronously and saves can come in bursts
+	graph_timer = graph_timer or vim.uv.new_timer()
 	vim.api.nvim_create_autocmd({ "FocusGained", "BufWritePost", "TermClose" }, {
 		group = group,
 		callback = function()
-			vim.schedule(function()
-				for _, wins in pairs(tabs) do
-					draw_graph(wins.graph)
-				end
-			end)
+			graph_timer:stop()
+			graph_timer:start(
+				300,
+				0,
+				vim.schedule_wrap(function()
+					for _, wins in pairs(tabs) do
+						draw_graph(wins.graph)
+					end
+				end)
+			)
 		end,
 	})
 

@@ -1,20 +1,7 @@
-if type -q eza
-    alias ll "eza -l -g --icons"
-    alias lla "ll -a"
-end
-
-if type -q nvim
-    alias vi nvim
-    alias vim nvim
-end
+alias ls "ls -p -G"
 
 if type -q cursor-agent
     alias ca cursor-agent
-end
-
-# Fzf
-if type -q bat
-    set -g fzf_preview_file_cmd "bat --style=numbers --color=always --line-range :500"
 end
 
 # Homebrew
