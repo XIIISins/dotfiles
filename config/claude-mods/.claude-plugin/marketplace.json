@@ -13,6 +13,11 @@
       "name": "tokyonight-moon",
       "source": "./tokyonight-moon",
       "description": "TokyoNight Moon color theme"
+    },
+    {
+      "name": "todo",
+      "source": "./todo",
+      "description": "Tag, dedupe and triage the flat todo list at ~/.local/share/todo.md"
     }
   ]
 }
