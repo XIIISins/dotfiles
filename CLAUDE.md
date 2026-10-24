@@ -25,6 +25,35 @@ only) when a task needs something that is only there:
   working on macOS, Linux, WSL and Windows, as the existing OS branches in
   `config/fish/` and the tmux clipboard command do.
 
+## Concurrent sessions
+
+- Several Claude sessions often run against this repo at once, and they share
+  one working tree. Before editing files, run `ListAgents`; if a session's
+  topic overlaps with the task, `SendMessage` it to ask what it is touching.
+- Uncommitted changes you did not make belong to another session: don't
+  stage, stash, revert or reformat them, and stage files by name instead of
+  `git add -A`.
+
+## Todo list
+
+- Ideas go in `~/.local/share/todo.md`, outside the repo so it is shared by
+  every session and worktree and never committed. One line per item; create
+  the file if it is missing:
+
+  ```
+  - [ ] open
+  - [~] in progress (session-name)
+  - [x] done
+  ```
+
+- When the user says "todo: ..." or "idea: ...", append a `- [ ]` line and
+  carry on; don't start the work.
+- When starting a task, read the file. If an open item matches, mark it
+  `[~]` with your session name (as `ListAgents` shows it); skip items
+  already `[~]` unless the user says otherwise, and mark `[x]` once the
+  change is merged. Edit only the line you are changing; never delete or
+  reword the user's lines.
+
 ## Testing and applying changes
 
 - Check linking with `./install.sh -n` (dry run) and `./install.sh status`.
