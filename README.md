@@ -13,7 +13,12 @@ symlinks each directory into place, so editing a config edits the repo.
 ./install.sh link tmux   # one package only
 ./install.sh hooks       # re-run post-link steps (Hammerspoon path, Claude plugins)
 ./install.sh unlink fish # replace the symlink with a real copy of the files
+./install.sh --server    # server: switch this fresh clone to the `server` branch and install that
 ```
+
+`--server` is for a fresh clone on a server (bash, tmux, nvim and git only). It refuses to run in a
+checkout that is already linked into `~/.config` or has uncommitted changes, since switching
+branches would rewrite the live configs.
 
 Existing directories are moved to `<name>.bak-<timestamp>`.
 
