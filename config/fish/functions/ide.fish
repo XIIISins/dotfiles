@@ -1,15 +1,44 @@
 function ide
-  if test (count $argv) -eq 1; and contains -- $argv[1] help -h --help
-    echo "usage: ide [path]   open the dev layout for a repo (default: current directory)
+  # where names are searched; set IDE_DIR in config-local.fish to move it
+  set -l base ~/Dev/xiiisins
+  set -q IDE_DIR; and set base $IDE_DIR
 
+  if test (count $argv) -eq 1; and contains -- $argv[1] help -h --help
+    echo "usage: ide [name|path]   open the dev layout for a repo (default: current directory)
+
+A name is looked up among the repos in $base: an exact match first, then a
+single partial match. Anything with a / or starting with . or ~ is a path.
 nvim top, claude right, terminals bottom, all in the repo root. Reuses the
 repo's window if it is already open. claude resumes the last session when it
-is under an hour old, otherwise it starts fresh."
+is under an hour old, otherwise it starts fresh.
+
+Set IDE_DIR in config-local.fish to search somewhere other than ~/Dev/xiiisins."
     return
   end
 
   set -l dir $PWD
-  test (count $argv) -gt 0; and set dir (path resolve $argv[1])
+  if test (count $argv) -gt 0
+    if string match -qr '^[.~]|/' -- $argv[1]
+      set dir (path resolve $argv[1])
+    else
+      # the repos are the git checkouts one level down (.git is a file in worktrees)
+      set -l repos
+      for d in $base/*/
+        set d (string trim -r -c / -- $d)
+        test -e $d/.git; and set -a repos (path basename $d)
+      end
+      set -l hits (contains -- $argv[1] $repos; and echo $argv[1])
+      set -q hits[1]; or set hits (string match -i -- "*$argv[1]*" $repos)
+      if test (count $hits) -eq 0
+        echo "ide: no repo found in $base: $argv[1]" >&2
+        return 1
+      else if test (count $hits) -gt 1
+        echo "ide: several repos match in $base: $hits" >&2
+        return 1
+      end
+      set dir $base/$hits
+    end
+  end
   test -f $dir; and set dir (path dirname $dir)
   if not test -d $dir
     echo "ide: no such directory: $dir" >&2
