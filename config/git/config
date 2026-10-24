@@ -1,0 +1,12 @@
+# tracked; identity and signing are machine-specific and live in config.local (not tracked)
+[include]
+	path = config.local
+
+[alias]
+	a = add
+	c = commit
+	d = diff
+	p = push
+	f = fetch
+	st = status
+	lg = log --oneline --graph --decorate --all

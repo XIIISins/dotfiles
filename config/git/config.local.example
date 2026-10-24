@@ -1,0 +1,15 @@
+# copy to config.local (untracked) and fill in; included from ./config
+[user]
+	name = Your Name
+	email = you@example.com
+	signingkey = ssh-ed25519 AAAA...
+
+[gpg]
+	format = ssh
+
+[gpg "ssh"]
+	# macOS; on Linux use /opt/1Password/op-ssh-sign
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+
+[commit]
+	gpgsign = true

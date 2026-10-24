@@ -1,0 +1,37 @@
+# Imports
+
+config-file = ~/.config/ghostty/keybinds
+
+# Aesthetics
+## Fonts
+font-family="Hack Nerd Font Mono"
+font-size="12"
+
+## Theme
+theme = "TokyoNight Moon"
+background-opacity = 0.9
+background-opacity-cells = true
+background-blur = true
+
+## Padding
+window-padding-x = 10
+window-padding-color = background
+
+window-theme = ghostty
+
+## MacOS specific
+macos-titlebar-style = "transparent"
+# macos-icon = xray
+
+
+# Functional
+## Scrollback
+scrollback-limit = 819200
+## Focus follows mouse
+focus-follows-mouse = true
+## Shell integration
+shell-integration = fish
+shell-integration-features = ssh-env,ssh-terminfo
+
+## Shell command
+command = /bin/sh -c 'for f in /opt/homebrew/bin/fish /usr/local/bin/fish /usr/bin/fish; do [ -x "$f" ] && exec "$f"; done; exec "$SHELL"'
