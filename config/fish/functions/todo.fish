@@ -1,6 +1,8 @@
 function todo
-  # outside the repo so every session and worktree shares it (see CLAUDE.md)
+  # outside the repo so every session and worktree shares it (see CLAUDE.md);
+  # set TODO_FILE in config-local.fish to keep it elsewhere, e.g. an Obsidian vault
   set -l file (set -q XDG_DATA_HOME; and echo $XDG_DATA_HOME; or echo $HOME/.local/share)/todo.md
+  set -q TODO_FILE; and set file $TODO_FILE
 
   # no arguments: show the list (numbered, for `todo rm`) instead of appending an empty item
   if test (count $argv) -eq 0
