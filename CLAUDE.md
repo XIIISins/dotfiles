@@ -27,12 +27,16 @@ only) when a task needs something that is only there:
 
 ## Concurrent sessions
 
-- Several Claude sessions often run against this repo at once, and they share
-  one working tree. Before editing files, run `ListAgents`; if a session's
-  topic overlaps with the task, `SendMessage` it to ask what it is touching.
-- Uncommitted changes you did not make belong to another session: don't
-  stage, stash, revert or reformat them, and stage files by name instead of
-  `git add -A`.
+- Several Claude sessions often run against this repo at once. Before editing
+  files, run `ListAgents`; if a session's topic overlaps with the task,
+  `SendMessage` it to ask what it is touching.
+- Always work in a git worktree (`EnterWorktree`), never directly in the main
+  checkout, and leave the main checkout on `main` (if possible) so the next
+  session starts clean. Don't switch the main checkout to a feature branch.
+  Remove the worktree once its branch is merged.
+- Uncommitted changes you did not make belong to another session (the main
+  checkout may still be shared): don't stage, stash, revert or reformat them,
+  and stage files by name instead of `git add -A`.
 
 ## Todo list
 
