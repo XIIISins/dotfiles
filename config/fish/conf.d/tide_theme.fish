@@ -17,8 +17,8 @@ set -g tide_pwd_bg_color $tn_bg_highlight
 set -g tide_pwd_color_anchors $tn_blue
 set -g tide_pwd_color_dirs $tn_fg
 set -g tide_pwd_color_truncated_dirs $tn_fg_dark
-set -g tide_git_bg_color $tn_green
-set -g tide_git_bg_color_unstable $tn_yellow
+set -g tide_git_bg_color $tn_blue
+set -g tide_git_bg_color_unstable $tn_orange
 set -g tide_git_bg_color_urgent $tn_red
 for part in branch conflicted dirty operation staged stash untracked upstream
     set -g tide_git_color_$part $tn_bg_dark
