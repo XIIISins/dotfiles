@@ -19,11 +19,19 @@
     "packages",
     "shell",
     "de",
-    "wm",
-    "wmtheme",
-    "theme",
     "icons",
-    "terminal",
+    // inside tmux/screen TERM_PROGRAM is the multiplexer, so ask tmux for the
+    // outer terminal's values (tmux keeps them in its global environment)
+    {
+      "type": "command",
+      "key": "Terminal",
+      "text": "if [ -n \"$TMUX\" ]; then tmux show-environment -g TERM_PROGRAM 2>/dev/null | cut -d= -f2; tmux show-environment -g TERM_PROGRAM_VERSION 2>/dev/null | cut -d= -f2; else echo \"$TERM_PROGRAM\"; echo \"$TERM_PROGRAM_VERSION\"; fi | paste -sd ' ' -"
+    },
+    {
+      "type": "command",
+      "key": "Theme",
+      "text": "ghostty +show-config 2>/dev/null | sed -n 's/^theme = //p'"
+    },
     "terminalfont",
     "cpu",
     "gpu",
@@ -31,7 +39,6 @@
     "swap",
     "disk",
     "battery",
-    "locale",
     "break",
     "colors"
   ]
