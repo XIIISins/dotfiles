@@ -21,6 +21,22 @@ function todo
     return
   end
 
+  # `todo archive` moves done items to todo-done.md next to the list; with more words it is still an item
+  if test "$argv[1]" = archive; and test (count $argv) -eq 1
+    set -l done (dirname $file)/todo-done.md
+    test -f $file; or begin; echo "todo: nothing done to archive"; return; end
+    set -l n (string match -r -- '^- \[x\].*' <$file | count)
+    if test $n -eq 0
+      echo "todo: nothing done to archive"
+      return
+    end
+    # append before removing so a failure never loses items
+    string match -r -- '^- \[x\].*' (cat $file) >> $done; or return 1
+    string match -v -r -- '^- \[x\].*' (cat $file) >$file.tmp; and mv $file.tmp $file
+    echo "todo: archived $n"
+    return
+  end
+
   mkdir -p (dirname $file)
   echo "- [ ] $argv" >> $file
 end
