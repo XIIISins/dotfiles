@@ -48,6 +48,13 @@ repo directory so nothing breaks. The backup stays complete.
 - `git`: aliases only. Identity and 1Password SSH signing live in
   `config.local` (untracked, copied across on first link); see
   `config.local.example`.
+- `claude-mods`: a local Claude Code plugin marketplace (`xiiisins-mods`).
+  Claude Code keeps plugins in `~/.claude`, so linking this package also
+  runs `claude plugin marketplace add` and `claude plugin install` for it
+  (needs `claude` on the PATH, and a fresh link; otherwise run the same two
+  commands by hand). `usage-band` draws context, rate-limit and cost bars
+  above the prompt in the palette colours. The installed copy is a snapshot:
+  after editing, `claude plugin update usage-band@xiiisins-mods` and restart.
 - `nvim`, `lazygit`: plain configs.
 
 ## Theming

@@ -15,7 +15,7 @@ dest=${XDG_CONFIG_HOME:-$HOME/.config}
 os=$(uname -s)
 dry=0
 
-packages="fish tmux ghostty hammerspoon karabiner nvim lazygit git palette"
+packages="fish tmux ghostty hammerspoon karabiner nvim lazygit git palette claude-mods"
 
 # packages that only make sense on one OS (uname -s); empty means everywhere
 only_on() {
@@ -61,6 +61,16 @@ hook() {
         hammerspoon)
             # Hammerspoon reads ~/.hammerspoon unless told otherwise
             run defaults write org.hammerspoon.Hammerspoon MJConfigFile "$dest/hammerspoon/init.lua"
+            ;;
+        claude-mods)
+            # plugins live in ~/.claude, not ~/.config: register the linked
+            # directory as a marketplace and install from it
+            if command -v claude >/dev/null 2>&1; then
+                run claude plugin marketplace add "$dest/claude-mods"
+                run claude plugin install usage-band@xiiisins-mods
+            else
+                echo "claude-mods: claude not found; later run: claude plugin marketplace add $dest/claude-mods"
+            fi
             ;;
     esac
 }
