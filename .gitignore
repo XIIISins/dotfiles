@@ -17,11 +17,6 @@ config/fish/completions/tide.fish
 config/fish/conf.d/_tide_init.fish
 config/fish/conf.d/fzf.fish
 config/fish/conf.d/nvm.fish
-config/fish/conf.d/z.fish
-config/fish/functions/__z_add.fish
-config/fish/functions/__z_clean.fish
-config/fish/functions/__z_complete.fish
-config/fish/functions/__z.fish
 config/fish/functions/_fzf_configure_bindings_help.fish
 config/fish/functions/_fzf_extract_var_info.fish
 config/fish/functions/_fzf_preview_changed_file.fish
