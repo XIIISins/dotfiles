@@ -40,7 +40,9 @@ repo directory so nothing breaks. The backup stays complete.
   and network.
 - `tmux`: plugins are installed by tpm; `tmux.conf` clones tpm and installs
   them on a fresh machine (needs git). `notify.sh` is the notch-style
-  notification popup.
+  notification popup. `layouts.sh` is the named layout selector (prefix `a`
+  picks, prefix `A` saves the current layout); the layouts are kept in
+  `layouts` and need tmux 3.8 (JSON layout strings).
 - `palette`: the TokyoNight Moon colours as data (`tokyonight-moon.palette`)
   plus `render`, a POSIX sh/awk script that turns it into each tool's format
   using the templates in `formats/` (fish, tmux, sh, css). The output in
