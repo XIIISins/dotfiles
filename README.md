@@ -32,6 +32,13 @@ repo directory so nothing breaks. The backup stays complete.
 - `tmux`: plugins are installed by tpm; `tmux.conf` clones tpm and installs
   them on a fresh machine (needs git). `notify.sh` is the notch-style
   notification popup.
+- `palette`: the TokyoNight Moon colours as data (`tokyonight-moon.palette`)
+  plus `render`, a POSIX sh/awk script that turns it into each tool's format
+  using the templates in `formats/` (fish, tmux, sh, css). The output in
+  `out/` is committed, so nothing needs `render` at runtime. After editing the
+  palette or a template, run `config/palette/render`; `render --check` fails
+  if `out/` is stale. To support another tool, add `formats/<name>.tmpl`
+  (header comment in `render` explains the format).
 - `ghostty`: `keybinds` is pulled in from `config` and unbinds Ghostty's
   split/tab keys.
 - `hammerspoon`: window focus and the Cmd+Return swallow. `install.sh` points
@@ -61,9 +68,19 @@ supply the Ghostty theme.
   Lua, get colors from `require("tokyonight.colors").setup({ style = "moon" })`
   rather than hardcoding hex (see `config/nvim/lua/config/tabline.lua`,
   `sidebar.lua`).
-- tmux: hardcoded hex values in `config/tmux/theme.conf` and
-  `statusline.conf`. Tmux can't read nvim colors, so keep new values to the
-  palette below.
+- tmux: `theme.conf` and `statusline.conf` use `${TN_*}` variables (`${TN_BLUE}`,
+  `${TN_BG_DARK}`, ...) from `palette/out/tokyonight-moon.tmux`, which
+  `tmux.conf` sources first. tmux only expands them in double-quoted strings
+  of files sourced after the palette, so new colours go in those files, not
+  in `tmux.conf` itself. `notify.sh` reads `palette/out/tokyonight-moon.sh`
+  (`$TN_BG`, `$TN_BG_RGB`, ...). Needs tmux 3.2+ (`%hidden`).
+- fish (tide, Rainbow style): `config/fish/conf.d/tide_theme.fish` sets the
+  `tide_*` colours as globals from `palette/out/tokyonight-moon.fish`. They
+  override the stock values in `tide-settings.fish`, so `tide configure` plus
+  regenerating that file does not undo the theme.
+
+The palette table below mirrors `config/palette/tokyonight-moon.palette`,
+which is the source of truth.
 
 ### Palette
 
@@ -83,7 +100,7 @@ supply the Ghostty theme.
 | red          | `#ff757f` |                                 |
 | yellow       | `#ffc777` |                                 |
 
-Extra values used in tmux that are not in the base palette:
+Extra values in the palette file that are not in the base palette (used by tmux and fzf):
 
 | Hex       | Use                                                |
 | --------- | -------------------------------------------------- |

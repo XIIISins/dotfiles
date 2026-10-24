@@ -6,10 +6,14 @@
 
 self=$0
 
+# TN_* colours (TokyoNight Moon); ../palette resolves through the repo symlink
+. "$(dirname "$0")/../palette/out/tokyonight-moon.sh"
+
 # pill MESSAGE: print the rounded black pill (caps blend into the window bg
-# #222436; popups paint unset backgrounds grey, so every bg is set explicitly)
+# TN_BG; popups paint unset backgrounds grey, so every bg is set explicitly)
 pill() {
-    printf '\033[?25l\033[0m\033[48;2;34;36;54m\033[38;2;0;0;0m\356\202\266\033[48;2;0;0;0m \033[38;2;200;211;245m%s \033[48;2;34;36;54m\033[38;2;0;0;0m\356\202\264\033[0m' "$1"
+    printf '\033[?25l\033[0m\033[48;2;%sm\033[38;2;%sm\356\202\266\033[48;2;%sm \033[38;2;%sm%s \033[48;2;%sm\033[38;2;%sm\356\202\264\033[0m' \
+        "$TN_BG_RGB" "$TN_BLACK_RGB" "$TN_BLACK_RGB" "$TN_FG_RGB" "$1" "$TN_BG_RGB" "$TN_BLACK_RGB"
 }
 
 # width in cells: left cap + space + message + space + right cap
@@ -31,14 +35,14 @@ case $1 in
 --confirm)
     q=$2 done=$3
     shift 3
-    tmux display-popup -E -B -s 'bg=#222436' -x C -y 1 -w "$(cells "$q (y/n)")" -h 1 \
+    tmux display-popup -E -B -s "bg=#$TN_BG" -x C -y 1 -w "$(cells "$q (y/n)")" -h 1 \
         -e "NOTIFY_Q=$q" -e "NOTIFY_DONE=$done" -e "NOTIFY_CMD=$*" "'$self' --ask" 2>/dev/null ||
         tmux confirm-before -p "$q (y/n)" "$*"
     ;;
 *)
     msg=$1
     secs=${2:-1.2}
-    tmux display-popup -E -B -s 'bg=#222436' -x C -y 1 -w "$(cells "$msg")" -h 1 \
+    tmux display-popup -E -B -s "bg=#$TN_BG" -x C -y 1 -w "$(cells "$msg")" -h 1 \
         "printf '%s' '$(pill "$msg")'; sleep $secs" 2>/dev/null ||
         tmux display-message "$msg"
     ;;

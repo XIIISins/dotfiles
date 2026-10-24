@@ -1,0 +1,23 @@
+# TokyoNight Moon. The one hand-edited source of the palette: `name hex`, no '#'.
+# Names use underscores; `./render` turns them into each tool's own naming.
+# Base values come from folke/tokyonight.nvim (style = "moon").
+bg            222436
+bg_dark       1e2030
+bg_highlight  2f334d
+fg            c8d3f5
+fg_dark       828bb8
+comment       636da6
+blue          82aaff
+cyan          86e1fc
+green         c3e88d
+magenta       c099ff
+orange        ff966c
+red           ff757f
+yellow        ffc777
+
+# not in the base palette, used by tmux and fzf
+fg_gutter     3b4261
+bg_float      272a3d
+selection     2d3f76
+dim           6c77a6
+black         000000
