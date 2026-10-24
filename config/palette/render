@@ -1,0 +1,129 @@
+#!/bin/sh
+# Render a palette through the templates in formats/ into out/.
+#
+#   ./render [-p palette] [format ...]   write out/<palette>.<ext> (all formats if none given)
+#   ./render [-p palette] --stdout fmt   print one format instead of writing it
+#   ./render [-p palette] --check        exit 1 if out/ differs from a fresh render
+#
+# Palette: <palette>.palette, lines of `name hex` (# comments). Template: formats/<fmt>.tmpl
+#   @rem text      comment, dropped
+#   @out file      output file name (placeholders allowed)
+#   @head / @line / @foot   what follows is written once before / once per colour / once after
+# Placeholders: {palette} {name} {NAME} {kebab} {hex} {#hex} {r} {g} {b}
+# To support a new tool, add a template; nothing in this script changes.
+
+set -eu
+
+dir=$(cd "$(dirname "$0")" && pwd)
+palette=tokyonight-moon
+mode=write
+
+while [ $# -gt 0 ]; do
+    case $1 in
+        -p) palette=$2; shift 2 ;;
+        --check) mode=check; shift ;;
+        --stdout) mode=stdout; shift ;;
+        -h | --help) sed -n '2,/^$/p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        -*) echo "render: unknown option $1" >&2; exit 2 ;;
+        *) break ;;
+    esac
+done
+
+src=$dir/$palette.palette
+if [ ! -f "$src" ]; then
+    echo "render: no palette $src" >&2
+    exit 2
+fi
+
+formats=$*
+if [ -z "$formats" ]; then
+    formats=$(cd "$dir/formats" && ls | sed -n 's/\.tmpl$//p')
+fi
+if [ "$mode" = stdout ] && [ "$(echo "$formats" | wc -w)" -ne 1 ]; then
+    echo "render: --stdout needs exactly one format" >&2
+    exit 2
+fi
+
+# expand <format> name|body: the output file name, or the rendered text
+expand() {
+    awk -v palette="$palette" -v want="$2" '
+        function hex2dec(h,   i, n, c) {
+            n = 0
+            for (i = 1; i <= length(h); i++) {
+                c = index("0123456789abcdef", substr(h, i, 1)) - 1
+                n = n * 16 + c
+            }
+            return n
+        }
+        function sub_all(s, key, val,   out, i) {
+            out = ""
+            while ((i = index(s, key)) > 0) {
+                out = out substr(s, 1, i - 1) val
+                s = substr(s, i + length(key))
+            }
+            return out s
+        }
+        function fill(s, name, hex,   kebab) {
+            kebab = name
+            gsub(/_/, "-", kebab)
+            s = sub_all(s, "{palette}", palette)
+            if (name == "") return s
+            s = sub_all(s, "{name}", name)
+            s = sub_all(s, "{NAME}", toupper(name))
+            s = sub_all(s, "{kebab}", kebab)
+            s = sub_all(s, "{#hex}", "#" hex)
+            s = sub_all(s, "{hex}", hex)
+            s = sub_all(s, "{r}", hex2dec(substr(hex, 1, 2)))
+            s = sub_all(s, "{g}", hex2dec(substr(hex, 3, 2)))
+            s = sub_all(s, "{b}", hex2dec(substr(hex, 5, 2)))
+            return s
+        }
+        FNR == NR {
+            sub(/#.*/, "")
+            if (NF >= 2) { names[++n] = $1; hexes[n] = tolower($2) }
+            next
+        }
+        /^@rem/ { next }
+        /^@out / { out = fill(substr($0, 6), ""); next }
+        /^@(head|line|foot)$/ { sect = substr($0, 2); next }
+        sect == "head" { head = head fill($0, "") "\n"; next }
+        sect == "line" { line[++nl] = $0; next }
+        sect == "foot" { foot = foot fill($0, "") "\n"; next }
+        END {
+            if (want == "name") { print out; exit }
+            printf "%s", head
+            for (i = 1; i <= n; i++)
+                for (j = 1; j <= nl; j++)
+                    print fill(line[j], names[i], hexes[i])
+            printf "%s", foot
+        }
+    ' "$src" "$dir/formats/$1.tmpl"
+}
+
+body=$(mktemp)
+trap 'rm -f "$body"' EXIT
+status=0
+
+for fmt in $formats; do
+    if [ ! -f "$dir/formats/$fmt.tmpl" ]; then
+        echo "render: no template formats/$fmt.tmpl" >&2
+        exit 2
+    fi
+    name=$(expand "$fmt" name)
+    expand "$fmt" body >"$body"
+    case $mode in
+        stdout) cat "$body" ;;
+        write)
+            mkdir -p "$dir/out"
+            cp "$body" "$dir/out/$name"
+            echo "out/$name"
+            ;;
+        check)
+            if ! cmp -s "$body" "$dir/out/$name"; then
+                echo "render: out/$name is stale, run ./render" >&2
+                status=1
+            fi
+            ;;
+    esac
+done
+exit $status

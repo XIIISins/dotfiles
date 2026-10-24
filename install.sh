@@ -15,7 +15,7 @@ dest=${XDG_CONFIG_HOME:-$HOME/.config}
 os=$(uname -s)
 dry=0
 
-packages="fish tmux ghostty hammerspoon karabiner nvim lazygit git"
+packages="fish tmux ghostty hammerspoon karabiner nvim lazygit git palette"
 
 # packages that only make sense on one OS (uname -s); empty means everywhere
 only_on() {

@@ -32,6 +32,13 @@ repo directory so nothing breaks. The backup stays complete.
 - `tmux`: plugins are installed by tpm; `tmux.conf` clones tpm and installs
   them on a fresh machine (needs git). `notify.sh` is the notch-style
   notification popup.
+- `palette`: the TokyoNight Moon colours as data (`tokyonight-moon.palette`)
+  plus `render`, a POSIX sh/awk script that turns it into each tool's format
+  using the templates in `formats/` (fish, tmux, sh, css). The output in
+  `out/` is committed, so nothing needs `render` at runtime. After editing the
+  palette or a template, run `config/palette/render`; `render --check` fails
+  if `out/` is stale. To support another tool, add `formats/<name>.tmpl`
+  (header comment in `render` explains the format).
 - `ghostty`: `keybinds` is pulled in from `config` and unbinds Ghostty's
   split/tab keys.
 - `hammerspoon`: window focus and the Cmd+Return swallow. `install.sh` points
@@ -63,7 +70,15 @@ supply the Ghostty theme.
   `sidebar.lua`).
 - tmux: hardcoded hex values in `config/tmux/theme.conf` and
   `statusline.conf`. Tmux can't read nvim colors, so keep new values to the
-  palette below.
+  palette below. `palette/out/tokyonight-moon.tmux` has the same values as
+  `@tn_*` options but is not sourced yet.
+- fish (tide, Rainbow style): `config/fish/conf.d/tide_theme.fish` sets the
+  `tide_*` colours as globals from `palette/out/tokyonight-moon.fish`. They
+  override the stock values in `tide-settings.fish`, so `tide configure` plus
+  regenerating that file does not undo the theme.
+
+The palette table below mirrors `config/palette/tokyonight-moon.palette`,
+which is the source of truth.
 
 ### Palette
 
