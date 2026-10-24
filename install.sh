@@ -1,13 +1,16 @@
 #!/bin/sh
 # Symlink manager: each directory in ./config becomes $XDG_CONFIG_HOME/<name>.
 #
-#   ./install.sh [-n] [link|unlink|status|hooks] [package ...]
+#   ./install.sh [-n] [--server] [link|unlink|status|hooks] [package ...]
 #
 #   link    (default) symlink packages, backing up whatever is already there
 #   unlink  replace the symlink with a real copy of the repo files
 #   status  show what is linked
 #   hooks   re-run the post-link steps of linked packages (they only run on a fresh link)
 #   -n      dry run, change nothing
+#   --server  check out the `server` branch (bash, tmux, nvim, git only) and run its
+#           install.sh instead; for a fresh clone on a server, not for a checkout that is
+#           already linked into ~/.config
 
 set -eu
 
@@ -15,6 +18,7 @@ repo=$(cd "$(dirname "$0")" && pwd)
 dest=${XDG_CONFIG_HOME:-$HOME/.config}
 os=$(uname -s)
 dry=0
+server=0
 
 packages="fish tmux ghostty hammerspoon karabiner nvim lazygit git palette claude-mods fastfetch"
 
@@ -177,19 +181,61 @@ status_pkg() {
     fi
 }
 
+# --server: this checkout is the full desktop setup, the servers get the `server` branch. Switch to
+# it and hand over to its install.sh, so one command works on a fresh clone of main.
+switch_to_server() {
+    if ! git -C "$repo" rev-parse --git-dir >/dev/null 2>&1; then
+        echo "--server: $repo is not a git checkout" >&2
+        exit 1
+    fi
+    if [ "$(git -C "$repo" symbolic-ref -q --short HEAD)" = server ]; then
+        return 0 # already on it: this is its own install.sh
+    fi
+    # switching branches rewrites the files a linked ~/.config points at
+    for pkg in $packages; do
+        if is_linked "$repo/config/$pkg" "$dest/$pkg"; then
+            echo "--server: $dest/$pkg is linked from this checkout; switching branches would change" >&2
+            echo "          the live config. Use a separate clone for the server variant." >&2
+            exit 1
+        fi
+    done
+    if [ -n "$(git -C "$repo" status --porcelain)" ]; then
+        echo "--server: uncommitted changes in $repo; commit or stash them first" >&2
+        exit 1
+    fi
+    run git -C "$repo" fetch origin server
+    if git -C "$repo" show-ref --verify -q refs/heads/server; then
+        run git -C "$repo" checkout server
+        soft git -C "$repo" merge --ff-only origin/server
+    else
+        run git -C "$repo" checkout --track origin/server
+    fi
+    if [ "$dry" = 1 ]; then
+        echo "    would: run the server branch's install.sh $cmd $*"
+        exit 0
+    fi
+    # the server branch has its own install.sh (with its own package list): hand over to it
+    exec "$repo/install.sh" "$cmd" "$@"
+}
+
 cmd=link
 while [ $# -gt 0 ]; do
     case $1 in
         -n | --dry-run) dry=1 ;;
+        --server) server=1 ;;
         link | unlink | status | hooks) cmd=$1 ;;
         -h | --help)
-            sed -n '2,10p' "$0"
+            sed -n '2,13p' "$0"
             exit 0
             ;;
         *) break ;;
     esac
     shift
 done
+
+if [ "$server" = 1 ]; then
+    switch_to_server "$@"
+fi
 
 if [ $# -gt 0 ]; then
     selected=$*
