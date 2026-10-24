@@ -26,3 +26,11 @@
   --zen-essential-tab-selected-bg: var(--tn-bg-highlight) !important;
   --zen-essential-tab-selected-bg-hover: var(--tn-fg-gutter) !important;
 }
+
+/* hover tint (tabs, toolbar buttons, url bar rows): Zen mixes 7% of its light
+   "paper" colour, which is grey; same strength in the accent instead */
+:root,
+.tabbrowser-tab {
+  --toolbarbutton-background-color-hover: color-mix(in srgb, var(--tn-blue) 10%, transparent) !important;
+  --tab-background-color-hover: color-mix(in srgb, var(--tn-blue) 10%, transparent) !important;
+}
