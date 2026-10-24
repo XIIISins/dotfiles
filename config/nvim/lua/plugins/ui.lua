@@ -102,6 +102,22 @@ return {
 
 	{
 		"folke/snacks.nvim",
+		opts = function(_, opts)
+			-- "n" on the dashboard (plain `vi`) starts a new file with the sidebar open; `vi <file>` has no dashboard
+			for _, item in ipairs(vim.tbl_get(opts, "dashboard", "preset", "keys") or {}) do
+				if item.key == "n" then
+					item.action = function()
+						if not require("config.sidebar").is_open() then
+							require("config.sidebar").open()
+						end
+						vim.cmd("enew | startinsert")
+					end
+				end
+			end
+		end,
+	},
+	{
+		"folke/snacks.nvim",
 		opts = {
 			scroll = { enabled = false },
 			dashboard = {
