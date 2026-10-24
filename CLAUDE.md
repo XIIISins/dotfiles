@@ -105,6 +105,16 @@ only) when a task needs something that is only there:
   `gitleaks git --staged --no-banner --redact -v`. Do not commit if it
   reports a leak; remove the secret (and tell the user if it was already
   committed or pushed) instead of allowlisting it.
+- Shipping a change (when asked) goes through a PR, never a direct push to
+  `main`. Automerge is off, so merge by hand:
+  1. Commit on a type-prefixed branch (gitleaks check first).
+  2. Push it (`git push -u origin <branch>`).
+  3. Open the PR against `main` (`gh pr create`). The body is a short
+     summary only: no test plan section (changes are tested locally) and no
+     "Generated with Claude Code" trailer.
+  4. Merge the PR (`gh pr merge <n> --merge`).
+  5. Clean up: switch to `main`, pull, then delete the branch locally
+     (`git branch -d`) and on the remote (`git push origin --delete`).
 
 ## Theming
 
