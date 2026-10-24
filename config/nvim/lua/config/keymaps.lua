@@ -28,6 +28,14 @@ keymap.set("n", "<C-m>", "<C-i>", opts)
 keymap.set("n", "te", ":tabedit<Return>")
 keymap.set("n", "<tab>", ":tabnext<Return>", opts)
 keymap.set("n", "<s-tab>", ":tabprev<Return>", opts)
+keymap.set("n", "sn", ":tabnew<Return>", opts)
+keymap.set("n", "sx", function()
+	if vim.fn.tabpagenr("$") > 1 then
+		vim.cmd.tabclose()
+	else
+		vim.notify("Last tab", vim.log.levels.INFO)
+	end
+end, opts)
 -- Split window
 keymap.set("n", "ss", ":split<Return>", opts)
 keymap.set("n", "sv", ":vsplit<Return>", opts)
