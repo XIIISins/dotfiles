@@ -20,12 +20,12 @@ os=$(uname -s)
 dry=0
 server=0
 
-packages="fish tmux ghostty hammerspoon karabiner nvim lazygit git palette claude-mods fastfetch"
+packages="fish tmux ghostty hammerspoon karabiner nvim lazygit git palette claude-mods fastfetch zen"
 
 # packages that only make sense on one OS (uname -s); empty means everywhere
 only_on() {
     case $1 in
-        hammerspoon | karabiner) echo Darwin ;;
+        hammerspoon | karabiner | zen) echo Darwin ;;
         *) echo "" ;;
     esac
 }
@@ -62,6 +62,29 @@ is_linked() {
     [ -L "$2" ] && [ "$(readlink "$2")" = "$1" ]
 }
 
+# Zen keeps its prefs in a per-machine profile, not ~/.config: link the tracked
+# files into the install's default profile (named in installs.ini)
+zen_profile_links() {
+    zen_dir="$HOME/Library/Application Support/zen"
+    rel=$(sed -n 's/^Default=//p' "$zen_dir/installs.ini" 2>/dev/null | head -n 1)
+    if [ -z "$rel" ] || [ ! -d "$zen_dir/$rel" ]; then
+        echo "zen: no profile found in $zen_dir; start Zen once, then run: ./install.sh hooks zen"
+        return 0
+    fi
+    for f in user.js zen-keyboard-shortcuts.json; do
+        t=$zen_dir/$rel/$f
+        if is_linked "$dest/zen/$f" "$t"; then
+            continue
+        fi
+        if [ -e "$t" ] || [ -L "$t" ]; then
+            run mv "$t" "$t.bak-$(date +%Y%m%d-%H%M%S)"
+        fi
+        echo "zen: linking $t -> $dest/zen/$f"
+        run ln -s "$dest/zen/$f" "$t"
+    done
+    echo "zen: restart Zen to pick up the changes"
+}
+
 # things that need doing once the link exists
 hook() {
     if [ -n "${DOTFILES_SKIP_HOOKS:-}" ]; then
@@ -71,6 +94,9 @@ hook() {
         hammerspoon)
             # Hammerspoon reads ~/.hammerspoon unless told otherwise
             soft defaults write org.hammerspoon.Hammerspoon MJConfigFile "$dest/hammerspoon/init.lua"
+            ;;
+        zen)
+            zen_profile_links
             ;;
         claude-mods)
             # plugins live in ~/.claude, not ~/.config: register the linked

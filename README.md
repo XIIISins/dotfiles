@@ -11,7 +11,7 @@ symlinks each directory into place, so editing a config edits the repo.
 ./install.sh             # link everything (existing dirs are backed up)
 ./install.sh status      # what is linked
 ./install.sh link tmux   # one package only
-./install.sh hooks       # re-run post-link steps (Hammerspoon path, Claude plugins)
+./install.sh hooks       # re-run post-link steps (Hammerspoon path, Claude plugins, Zen profile links)
 ./install.sh unlink fish # replace the symlink with a real copy of the files
 ./install.sh --server    # server: switch this fresh clone to the `server` branch and install that
 ```
@@ -22,7 +22,7 @@ branches would rewrite the live configs.
 
 Existing directories are moved to `<name>.bak-<timestamp>`.
 
-`hammerspoon` and `karabiner` are skipped outside macOS. On first link,
+`hammerspoon`, `karabiner` and `zen` are skipped outside macOS. On first link,
 machine-local files that are gitignored (fish_variables, tmux plugins,
 symlinks into other repos, ...) are copied from the old directory into the
 repo directory so nothing breaks. The backup stays complete.
@@ -71,6 +71,15 @@ repo directory so nothing breaks. The backup stays complete.
   a trimmed module list (no kernel, display, font, cursor, IP, power adapter,
   window manager or locale). Terminal names the real terminal app even inside
   tmux, and Theme is the Ghostty theme.
+- `zen`: `user.js` (an allowlist of the prefs I chose; Zen reapplies it on
+  every start) and `zen-keyboard-shortcuts.json` (Zen rewrites it itself, so
+  expect diffs). Zen keeps these in a per-machine profile, so linking the
+  package also symlinks both files into the install's default profile (macOS
+  only; restart Zen after). Never copy `prefs.js` in: it is ids, timestamps and
+  migration state. Not tracked: sessions, containers, handlers, and the
+  extensions themselves (reinstall by hand: uBlock Origin, Dark Reader,
+  Tampermonkey, Tab Session Manager, BetterTTV, Proton VPN, a new tab URL
+  extension).
 - `nvim`, `lazygit`: plain configs.
 
 ## Theming
