@@ -71,7 +71,7 @@ repo directory so nothing breaks. The backup stays complete.
   a trimmed module list (no kernel, display, font, cursor, IP, power adapter,
   window manager or locale). Terminal names the real terminal app even inside
   tmux, and Theme is the Ghostty theme.
-- `zen`: `user.js` (an allowlist of the prefs I chose; Zen reapplies it on
+- `zen`: `userChrome.css` (TokyoNight Moon, see Theming), `user.js` (an allowlist of the prefs I chose; Zen reapplies it on
   every start) and `zen-keyboard-shortcuts.json` (Zen rewrites it itself, so
   expect diffs). Zen keeps these in a per-machine profile, so linking the
   package also symlinks both files into the install's default profile (macOS
@@ -106,6 +106,11 @@ supply the Ghostty theme.
   of files sourced after the palette, so new colours go in those files, not
   in `tmux.conf` itself. `notify.sh` reads `palette/out/tokyonight-moon.sh`
   (`$TN_BG`, `$TN_BG_RGB`, ...). Needs tmux 3.2+ (`%hidden`).
+- zen: `config/zen/userChrome.css` imports `palette/out/tokyonight-moon.css`
+  and sets Zen's primary colour and dark base from the palette (Zen derives
+  the rest). It needs `toolkit.legacyUserProfileCustomizations.stylesheets`,
+  which `user.js` turns on. Web content is not themed (Dark Reader does that).
+  `install.sh` links both css files into the profile's `chrome/`.
 - fish (tide, Rainbow style): `config/fish/conf.d/tide_theme.fish` sets the
   `tide_*` colours as globals from `palette/out/tokyonight-moon.fish`. They
   override the stock values in `tide-settings.fish`, so `tide configure` plus

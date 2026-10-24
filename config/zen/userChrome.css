@@ -1,0 +1,36 @@
+/* TokyoNight Moon for the Zen UI. Zen derives its colours from the primary
+   colour and the dark base, so setting those (plus a few fixed surfaces)
+   recolours the lot. !important because a workspace theme sets the primary
+   colour inline. The palette is linked next to this file by install.sh. */
+@import url("tokyonight-moon.css");
+
+:root,
+:host(:is(.anonymous-content-host, notification-message)) {
+  --zen-primary-color: var(--tn-blue) !important;
+  --zen-branding-dark: var(--tn-bg-dark) !important;
+  --zen-main-browser-background: var(--tn-bg-dark) !important;
+  --zen-main-browser-background-toolbar: var(--tn-bg-dark) !important;
+  --zen-urlbar-background: var(--tn-bg) !important;
+  --zen-dialog-background: var(--tn-bg-float) !important;
+  --zen-colors-border: var(--tn-fg-gutter) !important;
+  --toolbox-textcolor: var(--tn-fg) !important;
+}
+
+/* selected tab: Zen paints it as a translucent white overlay, which reads as
+   grey; use the palette highlight like the other tools. Set on the tab too,
+   since Zen redeclares the variable there for essentials. */
+:root,
+.tabbrowser-tab {
+  --tab-background-color-selected: var(--tn-bg-highlight) !important;
+  --tab-text-color-selected: var(--tn-fg) !important;
+  --zen-essential-tab-selected-bg: var(--tn-bg-highlight) !important;
+  --zen-essential-tab-selected-bg-hover: var(--tn-fg-gutter) !important;
+}
+
+/* hover tint (tabs, toolbar buttons, url bar rows): Zen mixes 7% of its light
+   "paper" colour, which is grey; same strength in the accent instead */
+:root,
+.tabbrowser-tab {
+  --toolbarbutton-background-color-hover: color-mix(in srgb, var(--tn-blue) 10%, transparent) !important;
+  --tab-background-color-hover: color-mix(in srgb, var(--tn-blue) 10%, transparent) !important;
+}

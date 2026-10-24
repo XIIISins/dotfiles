@@ -71,16 +71,22 @@ zen_profile_links() {
         echo "zen: no profile found in $zen_dir; start Zen once, then run: ./install.sh hooks zen"
         return 0
     fi
-    for f in user.js zen-keyboard-shortcuts.json; do
-        t=$zen_dir/$rel/$f
-        if is_linked "$dest/zen/$f" "$t"; then
+    run mkdir -p "$zen_dir/$rel/chrome"
+    # source:target (relative to the profile); the palette css is imported by userChrome.css
+    for pair in "$dest/zen/user.js:user.js" \
+        "$dest/zen/zen-keyboard-shortcuts.json:zen-keyboard-shortcuts.json" \
+        "$dest/zen/userChrome.css:chrome/userChrome.css" \
+        "$repo/config/palette/out/tokyonight-moon.css:chrome/tokyonight-moon.css"; do
+        s=${pair%%:*}
+        t=$zen_dir/$rel/${pair#*:}
+        if is_linked "$s" "$t"; then
             continue
         fi
         if [ -e "$t" ] || [ -L "$t" ]; then
             run mv "$t" "$t.bak-$(date +%Y%m%d-%H%M%S)"
         fi
-        echo "zen: linking $t -> $dest/zen/$f"
-        run ln -s "$dest/zen/$f" "$t"
+        echo "zen: linking $t -> $s"
+        run ln -s "$s" "$t"
     done
     echo "zen: restart Zen to pick up the changes"
 }
