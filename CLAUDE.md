@@ -37,8 +37,10 @@ only) when a task needs something that is only there:
 ## Todo list
 
 - Ideas go in `~/.local/share/todo.md`, outside the repo so it is shared by
-  every session and worktree and never committed. One line per item; create
-  the file if it is missing:
+  every session and worktree and never committed. If `TODO_FILE` is set
+  (`config/fish/config-local.fish`, which your shell may not load; check it
+  there), use that path instead. One line per item; create the file if it is
+  missing:
 
   ```
   - [ ] open
