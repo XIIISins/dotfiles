@@ -62,6 +62,9 @@ repo directory so nothing breaks. The backup stays complete.
   `usage-band/.claude-plugin/types/` (what `tsconfig.json` extends) is written by
   Claude Code and gitignores itself, so typechecking works only where Claude Code
   has generated it.
+- `fastfetch`: `config.jsonc` with a one-colour logo in the palette blue and
+  a trimmed module list (no kernel, display, font, cursor, IP or power
+  adapter).
 - `nvim`, `lazygit`: plain configs.
 
 ## Theming
