@@ -138,6 +138,21 @@ function M.width()
 	return 0
 end
 
+--- jump straight to the files pane, or back to the previous window when already in the sidebar.
+--- Jumping directly (instead of `sh` through every split) keeps the window you came from as the one
+--- neo-tree opens files in.
+function M.focus()
+	local wins = tabs[vim.api.nvim_get_current_tabpage()]
+	if not wins or not valid(wins.files) then
+		return
+	end
+	if M.is_sidebar(vim.api.nvim_get_current_win()) then
+		vim.cmd.wincmd("p")
+	else
+		vim.api.nvim_set_current_win(wins.files)
+	end
+end
+
 function M.close()
 	M.enabled = false
 	for tab in pairs(tabs) do
