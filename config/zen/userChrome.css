@@ -1,0 +1,17 @@
+/* TokyoNight Moon for the Zen UI. Zen derives its colours from the primary
+   colour and the dark base, so setting those (plus a few fixed surfaces)
+   recolours the lot. !important because a workspace theme sets the primary
+   colour inline. The palette is linked next to this file by install.sh. */
+@import url("tokyonight-moon.css");
+
+:root,
+:host(:is(.anonymous-content-host, notification-message)) {
+  --zen-primary-color: var(--tn-blue) !important;
+  --zen-branding-dark: var(--tn-bg-dark) !important;
+  --zen-main-browser-background: var(--tn-bg-dark) !important;
+  --zen-main-browser-background-toolbar: var(--tn-bg-dark) !important;
+  --zen-urlbar-background: var(--tn-bg) !important;
+  --zen-dialog-background: var(--tn-bg-float) !important;
+  --zen-colors-border: var(--tn-fg-gutter) !important;
+  --toolbox-textcolor: var(--tn-fg) !important;
+}

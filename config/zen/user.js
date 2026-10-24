@@ -19,3 +19,6 @@ user_pref("sidebar.visibility", "hide-on-close");
 
 // clear form data on shutdown
 user_pref("privacy.clearOnShutdown_v2.formdata", true);
+
+// let chrome/userChrome.css load (TokyoNight Moon); Zen ships with this off
+user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
