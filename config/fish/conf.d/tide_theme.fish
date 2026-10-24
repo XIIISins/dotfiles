@@ -1,7 +1,7 @@
 # TokyoNight Moon for tide's Rainbow style, built from the generated palette.
-# Globals on purpose: conf.d/tide.fish sets the git colours with `set -g`, which
-# shadows the universal values in tide-settings.fish. The name sorts after
-# tide.fish so this wins. Palette variants: change the file name below.
+# Globals on purpose: they shadow the universal tide_* values in tide-settings.fish, so
+# `tide configure` plus regenerating that file does not undo the theme. Palette variants:
+# change the file name below.
 set -l palette (path resolve (status dirname)/../../palette)/out/tokyonight-moon.fish
 test -f $palette; or return
 source $palette

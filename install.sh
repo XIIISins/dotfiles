@@ -1,11 +1,12 @@
 #!/bin/sh
 # Symlink manager: each directory in ./config becomes $XDG_CONFIG_HOME/<name>.
 #
-#   ./install.sh [-n] [link|unlink|status] [package ...]
+#   ./install.sh [-n] [link|unlink|status|hooks] [package ...]
 #
 #   link    (default) symlink packages, backing up whatever is already there
 #   unlink  replace the symlink with a real copy of the repo files
 #   status  show what is linked
+#   hooks   re-run the post-link steps of linked packages (they only run on a fresh link)
 #   -n      dry run, change nothing
 
 set -eu
@@ -43,6 +44,11 @@ run() {
     fi
 }
 
+# like run, but a failing hook must not abort the remaining packages
+soft() {
+    run "$@" || echo "    failed (continuing): $*" >&2
+}
+
 supported() {
     want=$(only_on "$1")
     [ -z "$want" ] || [ "$want" = "$os" ]
@@ -60,15 +66,15 @@ hook() {
     case $1 in
         hammerspoon)
             # Hammerspoon reads ~/.hammerspoon unless told otherwise
-            run defaults write org.hammerspoon.Hammerspoon MJConfigFile "$dest/hammerspoon/init.lua"
+            soft defaults write org.hammerspoon.Hammerspoon MJConfigFile "$dest/hammerspoon/init.lua"
             ;;
         claude-mods)
             # plugins live in ~/.claude, not ~/.config: register the linked
             # directory as a marketplace and install from it
             if command -v claude >/dev/null 2>&1; then
-                run claude plugin marketplace add "$dest/claude-mods"
-                run claude plugin install usage-band@xiiisins-mods
-                run claude plugin install tokyonight-moon@xiiisins-mods
+                soft claude plugin marketplace add "$dest/claude-mods"
+                soft claude plugin install usage-band@xiiisins-mods
+                soft claude plugin install tokyonight-moon@xiiisins-mods
             else
                 echo "claude-mods: claude not found; later run: claude plugin marketplace add $dest/claude-mods"
             fi
@@ -142,6 +148,18 @@ unlink_pkg() {
     run cp -PR "$src" "$tgt"
 }
 
+hooks_pkg() {
+    pkg=$1
+    if ! supported "$pkg"; then
+        echo "$pkg: skipped (only on $(only_on "$pkg"))"
+    elif is_linked "$repo/config/$pkg" "$dest/$pkg"; then
+        echo "$pkg: running hooks"
+        hook "$pkg"
+    else
+        echo "$pkg: not linked"
+    fi
+}
+
 status_pkg() {
     pkg=$1
     src=$repo/config/$pkg
@@ -162,9 +180,9 @@ cmd=link
 while [ $# -gt 0 ]; do
     case $1 in
         -n | --dry-run) dry=1 ;;
-        link | unlink | status) cmd=$1 ;;
+        link | unlink | status | hooks) cmd=$1 ;;
         -h | --help)
-            sed -n '2,9p' "$0"
+            sed -n '2,10p' "$0"
             exit 0
             ;;
         *) break ;;

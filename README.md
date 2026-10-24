@@ -11,6 +11,7 @@ symlinks each directory into place, so editing a config edits the repo.
 ./install.sh             # link everything (existing dirs are backed up)
 ./install.sh status      # what is linked
 ./install.sh link tmux   # one package only
+./install.sh hooks       # re-run post-link steps (Hammerspoon path, Claude plugins)
 ./install.sh unlink fish # replace the symlink with a real copy of the files
 ```
 
@@ -55,6 +56,9 @@ repo directory so nothing breaks. The backup stays complete.
   commands by hand). `usage-band` draws context, rate-limit and cost bars
   above the prompt in the palette colours. The installed copy is a snapshot:
   after editing, `claude plugin update usage-band@xiiisins-mods` and restart.
+  `usage-band/.claude-plugin/types/` (what `tsconfig.json` extends) is written by
+  Claude Code and gitignores itself, so typechecking works only where Claude Code
+  has generated it.
 - `nvim`, `lazygit`: plain configs.
 
 ## Theming

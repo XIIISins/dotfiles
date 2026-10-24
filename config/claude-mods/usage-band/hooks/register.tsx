@@ -5,7 +5,7 @@ import type { Usage } from '../types'
 
 const usage = atom({ plugin: 'usage-band', key: 'usage' } as const, null)
 
-// TokyoNight Moon
+// TokyoNight Moon, copied from config/palette/tokyonight-moon.palette (a plugin can't read it at runtime; keep in sync by hand)
 const FG_GUTTER = '#3b4261'
 const FG_DARK = '#828bb8'
 const COMMENT = '#636da6'

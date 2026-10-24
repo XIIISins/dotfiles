@@ -22,6 +22,7 @@ keybind = super+digit_5=unbind
 keybind = super+digit_6=unbind
 keybind = super+digit_7=unbind
 keybind = super+digit_8=unbind
+keybind = super+digit_9=unbind
 keybind = super+d=unbind
 keybind = super+shift+d=unbind
 keybind = super+[=unbind
