@@ -123,7 +123,7 @@ only) when a task needs something that is only there:
 
 Everything uses TokyoNight Moon. Before choosing or changing any color, read
 the "Theming" section of `README.md` for the palette and use those hex values
-instead of looking colors up. Keep new tmux colors within that palette.
+instead of looking colors up. Keep new tmux colors within that palette, as `${TN_*}` variables rather than hex (see `README.md` Theming).
 
 ## Glyphs and icons
 

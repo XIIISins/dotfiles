@@ -68,10 +68,12 @@ supply the Ghostty theme.
   Lua, get colors from `require("tokyonight.colors").setup({ style = "moon" })`
   rather than hardcoding hex (see `config/nvim/lua/config/tabline.lua`,
   `sidebar.lua`).
-- tmux: hardcoded hex values in `config/tmux/theme.conf` and
-  `statusline.conf`. Tmux can't read nvim colors, so keep new values to the
-  palette below. `palette/out/tokyonight-moon.tmux` has the same values as
-  `@tn_*` options but is not sourced yet.
+- tmux: `theme.conf` and `statusline.conf` use `${TN_*}` variables (`${TN_BLUE}`,
+  `${TN_BG_DARK}`, ...) from `palette/out/tokyonight-moon.tmux`, which
+  `tmux.conf` sources first. tmux only expands them in double-quoted strings
+  of files sourced after the palette, so new colours go in those files, not
+  in `tmux.conf` itself. `notify.sh` reads `palette/out/tokyonight-moon.sh`
+  (`$TN_BG`, `$TN_BG_RGB`, ...). Needs tmux 3.2+ (`%hidden`).
 - fish (tide, Rainbow style): `config/fish/conf.d/tide_theme.fish` sets the
   `tide_*` colours as globals from `palette/out/tokyonight-moon.fish`. They
   override the stock values in `tide-settings.fish`, so `tide configure` plus
@@ -98,7 +100,7 @@ which is the source of truth.
 | red          | `#ff757f` |                                 |
 | yellow       | `#ffc777` |                                 |
 
-Extra values used in tmux that are not in the base palette:
+Extra values in the palette file that are not in the base palette (used by tmux and fzf):
 
 | Hex       | Use                                                |
 | --------- | -------------------------------------------------- |
