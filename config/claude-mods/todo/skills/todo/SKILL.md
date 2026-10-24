@@ -1,12 +1,14 @@
 ---
 name: todo
-description: Organize the user's flat todo list at ~/.local/share/todo.md. Adds #tag suffixes, merges duplicates, flags stale in-progress items, and asks about whatever it can't place. Use when the user runs /todo:todo or asks to sort, triage or clean up their todo list or ideas.
+description: Organize the user's flat todo list at ~/.local/share/todo.md (or $TODO_FILE). Adds #tag suffixes, merges duplicates, flags stale in-progress items, and asks about whatever it can't place. Use when the user runs /todo:todo or asks to sort, triage or clean up their todo list or ideas.
 ---
 
 # Todo triage
 
 The list is one flat file, `~/.local/share/todo.md` (`$XDG_DATA_HOME/todo.md`
-if set). The user appends to it from a shell with `todo "idea"`, and other
+if set), or `$TODO_FILE` if set. That variable lives in
+`config/fish/config-local.fish`, which a non-fish shell may not load, so grep
+it there before assuming the default. The user appends to it from a shell with `todo "idea"`, and other
 Claude sessions append and mark items too, so edit it carefully.
 
 ```
