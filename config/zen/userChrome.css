@@ -15,3 +15,14 @@
   --zen-colors-border: var(--tn-fg-gutter) !important;
   --toolbox-textcolor: var(--tn-fg) !important;
 }
+
+/* selected tab: Zen paints it as a translucent white overlay, which reads as
+   grey; use the palette highlight like the other tools. Set on the tab too,
+   since Zen redeclares the variable there for essentials. */
+:root,
+.tabbrowser-tab {
+  --tab-background-color-selected: var(--tn-bg-highlight) !important;
+  --tab-text-color-selected: var(--tn-fg) !important;
+  --zen-essential-tab-selected-bg: var(--tn-bg-highlight) !important;
+  --zen-essential-tab-selected-bg-hover: var(--tn-fg-gutter) !important;
+}
