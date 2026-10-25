@@ -1,5 +1,5 @@
 function ide
-    # where names are searched; set IDE_DIR in config-local.fish to move it
+    # where names are searched; set IDE_DIR in ~/.config/local/fish/config.fish to move it
     set -l base ~/Dev/xiiisins
     set -q IDE_DIR; and set base $IDE_DIR
 
@@ -12,7 +12,7 @@ nvim top, claude right, terminals bottom, all in the repo root. Reuses the
 repo's window if it is already open. claude resumes the last session when it
 is under an hour old, otherwise it starts fresh.
 
-Set IDE_DIR in config-local.fish to search somewhere other than ~/Dev/xiiisins."
+Set IDE_DIR in ~/.config/local/fish/config.fish to search somewhere other than ~/Dev/xiiisins."
         return
     end
 

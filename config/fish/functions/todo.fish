@@ -1,6 +1,6 @@
 function todo
     # outside the repo so every session and worktree shares it (see CLAUDE.md);
-    # set TODO_FILE in config-local.fish to keep it elsewhere, e.g. an Obsidian vault
+    # set TODO_FILE in ~/.config/local/fish/config.fish to keep it elsewhere, e.g. an Obsidian vault
     set -l file (set -q XDG_DATA_HOME; and echo $XDG_DATA_HOME; or echo $HOME/.local/share)/todo.md
     set -q TODO_FILE; and set file $TODO_FILE
 
@@ -12,7 +12,7 @@ function todo
        todo archive        move done items to todo-done.md
        todo help           show this help
 
-list: $file (override with TODO_FILE in config-local.fish)"
+list: $file (override with TODO_FILE in ~/.config/local/fish/config.fish)"
         return
     end
 

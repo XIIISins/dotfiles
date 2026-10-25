@@ -2,11 +2,11 @@
 
 # machine-local or generated; install.sh carries these across on first link
 config/fish/fish_variables
-config/fish/config-local.fish
 config/tmux/plugins/
 config/karabiner/automatic_backups/
 
-# machine-specific git identity and signing (see config.local.example)
+# old places for machine-local settings, still read until every machine uses ~/.config/local
+config/fish/config-local.fish
 config/git/config.local
 
 # fisher plugins (see fish_plugins); `fisher update` reinstalls them
