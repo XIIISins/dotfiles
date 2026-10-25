@@ -4,6 +4,10 @@
 config/fish/fish_variables
 config/tmux/plugins/
 config/karabiner/automatic_backups/
+# btop rewrites its settings on exit; only the theme is tracked
+config/btop/btop.conf
+# spicetify rewrites its settings (backup version, current theme) itself; only the theme is tracked
+config/spicetify/config-xpui.ini
 
 # old places for machine-local settings, still read until every machine uses ~/.config/local
 config/fish/config-local.fish

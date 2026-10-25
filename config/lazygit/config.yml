@@ -7,3 +7,15 @@ customCommands:
     output: terminal
 gui:
   mouseEvents: false
+  # TokyoNight Moon (config/palette); lazygit takes hex, not variables
+  theme:
+    activeBorderColor: ["#82aaff", bold]
+    inactiveBorderColor: ["#3b4261"]
+    searchingActiveBorderColor: ["#ffc777", bold]
+    optionsTextColor: ["#82aaff"]
+    selectedLineBgColor: ["#2d3f76"]
+    inactiveViewSelectedLineBgColor: ["#2f334d"]
+    cherryPickedCommitFgColor: ["#82aaff"]
+    cherryPickedCommitBgColor: ["#c099ff"]
+    unstagedChangesColor: ["#ff757f"]
+    defaultFgColor: ["#c8d3f5"]

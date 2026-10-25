@@ -21,7 +21,7 @@ os=$(uname -s)
 dry=0
 server=0
 
-packages="fish tmux ghostty hammerspoon karabiner nvim lazygit git palette claude-mods fastfetch zen"
+packages="fish tmux ghostty hammerspoon karabiner nvim lazygit git palette claude-mods fastfetch zen btop spicetify"
 
 # packages that only make sense on one OS (uname -s); empty means everywhere
 only_on() {
@@ -39,6 +39,8 @@ local_paths() {
         tmux) echo "plugins" ;;
         karabiner) echo "automatic_backups" ;;
         git) echo "config.local" ;;
+        btop) echo "btop.conf" ;;
+        spicetify) echo "config-xpui.ini" ;;
     esac
 }
 
@@ -93,6 +95,43 @@ zen_profile_links() {
     echo "zen: restart Zen to pick up the changes"
 }
 
+# Obsidian snippets live inside each vault (iCloud here), so copy the rendered one into
+# every vault Obsidian knows about instead of linking it: it then syncs to the other devices
+obsidian_snippets() {
+    conf="$HOME/Library/Application Support/obsidian/obsidian.json"
+    if [ "$os" != Darwin ] || [ ! -f "$conf" ] || ! command -v jq >/dev/null 2>&1; then
+        return 0
+    fi
+    snippet=$repo/config/palette/out/tokyonight-moon-obsidian.css
+    jq -r '.vaults[].path' "$conf" | while IFS= read -r vault; do
+        if [ -d "$vault/.obsidian" ]; then
+            echo "obsidian: copying the snippet into $vault"
+            run mkdir -p "$vault/.obsidian/snippets"
+            run cp "$snippet" "$vault/.obsidian/snippets/tokyonight-moon.css"
+        fi
+    done
+    echo "obsidian: enable it under Settings > Appearance > CSS snippets"
+}
+
+# Vesktop reads themes from its data dir, not ~/.config: link the rendered one in
+vesktop_theme() {
+    themes="$HOME/Library/Application Support/vesktop/themes"
+    if [ "$os" != Darwin ] || [ ! -d "$HOME/Library/Application Support/vesktop" ]; then
+        return 0
+    fi
+    s=$repo/config/palette/out/tokyonight-moon-discord.theme.css
+    t=$themes/tokyonight-moon.theme.css
+    if ! is_linked "$s" "$t"; then
+        if [ -e "$t" ] || [ -L "$t" ]; then
+            run mv "$t" "$t.bak-$(date +%Y%m%d-%H%M%S)"
+        fi
+        echo "vesktop: linking $t -> $s"
+        run mkdir -p "$themes"
+        run ln -s "$s" "$t"
+    fi
+    echo "vesktop: enable it under Settings > Themes"
+}
+
 # things that need doing once the link exists
 hook() {
     if [ -n "${DOTFILES_SKIP_HOOKS:-}" ]; then
@@ -105,6 +144,10 @@ hook() {
             ;;
         zen)
             zen_profile_links
+            ;;
+        palette)
+            obsidian_snippets
+            vesktop_theme
             ;;
         claude-mods)
             # plugins live in ~/.claude, not ~/.config: register the linked
