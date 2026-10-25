@@ -88,7 +88,10 @@ repo directory so nothing breaks. The backup stays complete.
   extensions themselves (reinstall by hand: uBlock Origin, Dark Reader,
   Tampermonkey, Tab Session Manager, BetterTTV, Proton VPN, a new tab URL
   extension).
-- `nvim`, `lazygit`: plain configs.
+- `nvim`: LazyVim. The dashboard header is read from
+  `~/.config/local/nvim/dashboard-header.txt` if it exists (see Not
+  tracked), otherwise it is the built-in one.
+- `lazygit`: plain config.
 
 ## Theming
 
@@ -171,6 +174,9 @@ Extra values in the palette file that are not in the base palette (used by tmux 
 - Symlinks into other repos: carried across on first link; list them in
   `.git/info/exclude` to keep them out of `git status`.
 - `tmux/plugins/`, `karabiner/automatic_backups/`: third-party or generated.
+- `~/.config/local/<tool>/`: per-machine overrides that should not be in a
+  public repo (e.g. a work banner as `nvim/dashboard-header.txt`). It is not
+  a package, so `install.sh` never links or backs it up; create it by hand.
 - Anything with credentials or app state (`gh`, `op`, `1Password`, `rclone`,
   `envman`, `raycast`, ...).
 
