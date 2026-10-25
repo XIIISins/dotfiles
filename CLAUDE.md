@@ -61,7 +61,9 @@ static as possible. `main` has the full desktop setup; keep this branch a trimme
 - Branch names follow Conventional Commits types: `<type>/<scope>_<description>`.
 - Commit messages follow Conventional Commits and do not include a `Co-Authored-By` trailer.
 - Before every commit, stage the changes and run `gitleaks git --staged --no-banner --redact -v`.
-  Do not commit if it reports a leak.
+  The pre-commit hook (`.githooks/`, enabled by `install.sh`) runs it too, plus the linters (see
+  `README.md` "Use"); fix what it reports, never bypass it with `--no-verify`. Do not commit if
+  gitleaks reports a leak.
 - Never commit credentials or app state. Use `config.local` instead.
 - Shipping goes through a PR against `server`, never a direct push. Automerge is off, so merge
   by hand, then delete the branch locally and on the remote.
