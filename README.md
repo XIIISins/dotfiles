@@ -88,6 +88,7 @@ repo directory so nothing breaks. The backup stays complete.
   extensions themselves (reinstall by hand: uBlock Origin, Dark Reader,
   Tampermonkey, Tab Session Manager, BetterTTV, Proton VPN, a new tab URL
   extension).
+- `btop`, `spicetify`: the TokyoNight Moon theme only; see Theming.
 - `nvim`, `lazygit`: plain configs.
 
 ## Theming
@@ -123,6 +124,37 @@ supply the Ghostty theme.
   `tide_*` colours as globals from `palette/out/tokyonight-moon.fish`. They
   override the stock values in `tide-settings.fish`, so `tide configure` plus
   regenerating that file does not undo the theme.
+- fish syntax highlighting: `conf.d/fish_theme.fish` sets `fish_color_*` and
+  `fish_pager_color_*` from the palette. It must load after
+  `fish_frozen_theme.fish` (fish's stock colours), which its name does.
+- fzf and eza: `conf.d/tool_theme.fish` sets `FZF_DEFAULT_OPTS` (`--color`
+  only) and `EZA_COLORS`; the palette's fish output has `tn_<name>_rgb` for
+  the SGR codes.
+- lazygit: `gui.theme` in `config/lazygit/config.yml`, with hex literals
+  (lazygit has no variables).
+- btop: `config/btop/themes/tokyonight-moon.theme`. `btop.conf` is untracked
+  (btop rewrites it), so pick the theme once in btop (`esc`, Options, Color
+  theme).
+- Obsidian: `render` writes `out/tokyonight-moon-obsidian.css`, a
+  self-contained snippet. `./install.sh hooks palette` copies it into the
+  `.obsidian/snippets/` of every vault Obsidian lists (macOS, needs `jq`);
+  copied rather than linked so iCloud syncs it. Enable it once under Settings,
+  Appearance, CSS snippets. Re-run the hook after changing the palette.
+- Spotify: Spicetify (`brew install spicetify-cli`) with
+  `config/spicetify/Themes/tokyonight-moon` (hex literals, Spicetify has no
+  variables). `config-xpui.ini` is untracked (Spicetify rewrites it). Once:
+  `spicetify config current_theme tokyonight-moon color_scheme moon`, then
+  `spicetify backup apply`; after a Spotify update, `spicetify restore backup
+  apply`. It patches the Spotify app, which Spotify's terms do not allow.
+- Discord: Vesktop (`brew install --cask vesktop`, a Vencord client) with
+  `render`'s `out/tokyonight-moon-discord.theme.css`. `./install.sh hooks
+  palette` links it into Vesktop's themes folder; enable it under Settings,
+  Themes. Discord renames its CSS variables now and then, so both old and new
+  names are set; if something is off after an update, inspect it with
+  Vesktop's devtools and fix `formats/discord.tmpl`. Third-party clients are
+  against Discord's terms.
+- Not themed on purpose: the native macOS apps (Mail, Calendar, WhatsApp),
+  which only follow the system accent and wallpaper.
 
 The palette table below mirrors `config/palette/tokyonight-moon.palette`,
 which is the source of truth.
