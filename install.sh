@@ -31,7 +31,8 @@ only_on() {
     esac
 }
 
-# machine-local paths (gitignored) carried over from the old directory on first link
+# machine-local paths (gitignored) carried over from the old directory on first link;
+# config-local.fish and config.local are the old places, superseded by ~/.config/local
 local_paths() {
     case $1 in
         fish) echo "fish_variables config-local.fish" ;;

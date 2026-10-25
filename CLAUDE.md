@@ -42,7 +42,8 @@ only) when a task needs something that is only there:
 
 - Ideas go in `~/.local/share/todo.md`, outside the repo so it is shared by
   every session and worktree and never committed. If `TODO_FILE` is set
-  (`config/fish/config-local.fish`, which your shell may not load; check it
+  (`~/.config/local/fish/config.fish`, or the old
+  `config/fish/config-local.fish`; your shell may not load them, so check
   there), use that path instead. One line per item; create the file if it is
   missing:
 
@@ -71,16 +72,21 @@ only) when a task needs something that is only there:
 
 ## Files that must not be committed
 
+- Machine-local settings (fish, git identity and 1Password SSH signing, the
+  nvim dashboard header) live in `$XDG_CONFIG_HOME/local/<tool>/`, outside
+  the repo.
 - Machine-local or generated, already gitignored:
-  `config/fish/fish_variables`, `config/fish/config-local.fish`,
-  `config/git/config.local` (git identity and 1Password SSH signing),
+  `config/fish/fish_variables`, the old `config/fish/config-local.fish` and
+  `config/git/config.local` (still read during the move),
   `config/tmux/plugins/`, `config/karabiner/automatic_backups/`, and the
   fisher-installed plugin files in `config/fish/` (completions, conf.d,
   functions).
 - Check `.gitignore` before adding a new file under `config/fish/`, since
   most of its `functions/` and `conf.d/` files are plugin-managed.
+- New per-machine overrides go in `$XDG_CONFIG_HOME/local/<tool>/` (outside
+  the repo, read by the config if present), not in a new gitignored file.
 - Never commit credentials or app state (`gh`, `op`, `1Password`, `rclone`,
-  `envman`, `raycast`, ...). Use `config.local` or 1Password instead.
+  `envman`, `raycast`, ...). Use `~/.config/local/` or 1Password instead.
 
 ## Generated files
 

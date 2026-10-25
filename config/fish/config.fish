@@ -51,8 +51,11 @@ switch (uname)
         source $config_dir/config-windows.fish
 end
 
-if test -f $config_dir/config-local.fish
-    source $config_dir/config-local.fish
+# machine-local settings live outside the repo; config-local.fish is the old place, still read
+# (first, so the new file wins) until every machine has moved
+set -l local_dir (set -q XDG_CONFIG_HOME; and echo $XDG_CONFIG_HOME; or echo $HOME/.config)/local
+for f in $config_dir/config-local.fish $local_dir/fish/config.fish
+    test -f $f; and source $f
 end
 
 # New machine: install fisher and the plugins listed in fish_plugins, then apply the

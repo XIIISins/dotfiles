@@ -36,8 +36,9 @@ repo directory so nothing breaks. The backup stays complete.
 ## Layout
 
 - `fish`: `config.fish` sources `config-osx.fish` / `config-linux.fish` /
-  `config-windows.fish`, then `config-local.fish` if present (machine-local,
-  ignored). Plugins are listed in `fish_plugins`, each pinned to a tag or
+  `config-windows.fish`, then `~/.config/local/fish/config.fish` if present
+  (machine-local, outside the repo; the old `config-local.fish` is still
+  read). Plugins are listed in `fish_plugins`, each pinned to a tag or
   commit (`owner/repo@ref`); `fisher_outdated` shows which pins are behind
   upstream (tag pins against the newest tag, commit pins against HEAD), and
   an interactive shell runs it weekly in the background and prints the result
@@ -62,9 +63,11 @@ repo directory so nothing breaks. The backup stays complete.
   Hammerspoon at this directory.
 - `karabiner`: Caps Lock to Ctrl and the Aero 75 device entry. Karabiner
   rewrites `karabiner.json` itself, so expect small diffs.
-- `git`: aliases only. Identity and 1Password SSH signing live in
-  `config.local` (untracked, copied across on first link); see
-  `config.local.example`.
+- `git`: aliases and `push.autoSetupRemote`. Identity, 1Password SSH
+  signing, credentials and per-directory identities (`includeIf`) live in
+  `~/.config/local/git/config`, included last; see `config.local.example`.
+  The old `config.local` is still read. Keep `~/.gitconfig` absent: git
+  reads it too, so it would silently add to these settings.
 - `claude-mods`: a local Claude Code plugin marketplace (`xiiisins-mods`).
   Claude Code keeps plugins in `~/.claude`, so linking this package also
   runs `claude plugin marketplace add` and `claude plugin install` for it
@@ -89,7 +92,10 @@ repo directory so nothing breaks. The backup stays complete.
   Tampermonkey, Tab Session Manager, BetterTTV, Proton VPN, a new tab URL
   extension).
 - `btop`, `spicetify`: the TokyoNight Moon theme only; see Theming.
-- `nvim`, `lazygit`: plain configs.
+- `nvim`: LazyVim. The dashboard header is read from
+  `~/.config/local/nvim/dashboard-header.txt` if it exists (see Not
+  tracked), otherwise it is the built-in one.
+- `lazygit`: plain config.
 
 ## Theming
 
@@ -203,6 +209,12 @@ Extra values in the palette file that are not in the base palette (used by tmux 
 - Symlinks into other repos: carried across on first link; list them in
   `.git/info/exclude` to keep them out of `git status`.
 - `tmux/plugins/`, `karabiner/automatic_backups/`: third-party or generated.
+- `~/.config/local/<tool>/`: per-machine overrides that should not be in a
+  public repo: `fish/config.fish`, `git/config` (identity, signing,
+  credentials) and `nvim/dashboard-header.txt` (e.g. a work banner). It is
+  not a package, so `install.sh` never links or backs it up; create it by
+  hand. `fish/config-local.fish` and `git/config.local` in the repo are the
+  old places, still read and ignored until every machine has moved.
 - Anything with credentials or app state (`gh`, `op`, `1Password`, `rclone`,
   `envman`, `raycast`, ...).
 
