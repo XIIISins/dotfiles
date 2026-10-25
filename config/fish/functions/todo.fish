@@ -49,7 +49,9 @@ list: $file (override with TODO_FILE in config-local.fish)"
         end
         # append before removing so a failure never loses items
         string match -r -- '^- \[x\].*' (cat $file) >>$done; or return 1
-        string match -v -r -- '^- \[x\].*' (cat $file) >$file.tmp; and mv $file.tmp $file
+        # string match -v exits 1 when nothing is left (all items done), so don't chain the mv on it
+        string match -v -r -- '^- \[x\].*' (cat $file) >$file.tmp
+        mv $file.tmp $file
         echo "todo: archived $n"
         return
     end
