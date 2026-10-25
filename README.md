@@ -39,11 +39,11 @@ repo directory so nothing breaks. The backup stays complete.
   `config-windows.fish`, then `config-local.fish` if present (machine-local,
   ignored). Plugins are listed in `fish_plugins`, each pinned to a tag or
   commit (`owner/repo@ref`); `fisher_outdated` shows which pins are behind
-  upstream, and an interactive shell runs it weekly in the background and
-  prints the result on the next start. Plugin files are not tracked: on a
-  fresh machine the first interactive shell installs fisher (pinned), runs
-  `fisher update`, applies `tide-settings.fish` and restarts. Needs `curl`
-  and network.
+  upstream (tag pins against the newest tag, commit pins against HEAD), and
+  an interactive shell runs it weekly in the background and prints the result
+  on the next start. Plugin files are not tracked: on a fresh machine the
+  first interactive shell installs fisher (pinned), runs `fisher update`,
+  applies `tide-settings.fish` and restarts. Needs `curl`, `git` and network.
 - `tmux`: plugins are installed by tpm; `tmux.conf` clones tpm and installs
   them on a fresh machine (needs git). `notify.sh` is the notch-style
   notification popup. `layouts.sh` is the named layout selector (prefix `a`

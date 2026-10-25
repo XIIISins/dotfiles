@@ -1,7 +1,9 @@
-# Weekly check for newer upstream commits of the pinned fish_plugins. The check
-# runs in the background; its result is shown on the next shell start.
+# Weekly check for newer upstream tags (or commits, for commit pins) of the
+# pinned fish_plugins. The check runs in the background; its result is shown on
+# the next shell start.
 status is-interactive; or return
 type -q curl; or return
+type -q git; or return
 
 set -l cache (set -q XDG_CACHE_HOME; and echo $XDG_CACHE_HOME; or echo $HOME/.cache)/fish-plugin-updates
 mkdir -p (dirname $cache)
