@@ -45,6 +45,13 @@ repo directory so nothing breaks. The backup stays complete.
   on the next start. Plugin files are not tracked: on a fresh machine the
   first interactive shell installs fisher (pinned), runs `fisher update`,
   applies `tide-settings.fish` and restarts. Needs `curl`, `git` and network.
+  Abbreviations (git, systemctl, docker, kubectl) are in `config.fish` and need
+  fish 3.6+. The `fzf_*` functions are fzf pickers with a short abbreviation
+  each: `fb` git branch, `fw` git worktree, `fsh` ssh host (from
+  `~/.ssh/config` and `config.d/`), `fdk` docker container
+  (`sh`/`logs`/`restart`/`stop`), `fkx` kube context or namespace, `fsd` systemd
+  service (`status`/`logs`/`restart`/`stop`/`edit`). The docker, kube and systemd
+  ones are only set up when the tool is installed.
 - `tmux`: plugins are installed by tpm; `tmux.conf` clones tpm and installs
   them on a fresh machine (needs git). `notify.sh` is the notch-style
   notification popup. `layouts.sh` is the named layout selector (prefix `a`

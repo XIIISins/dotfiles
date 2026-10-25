@@ -9,7 +9,6 @@ set -g fish_prompt_pwd_dir_length 1
 alias la "ls -A"
 alias ll "ls -l"
 alias lla "ll -A"
-alias g git
 
 if type -q eza
     alias ll "eza -l -g --icons"
@@ -19,6 +18,37 @@ end
 if type -q nvim
     alias vi nvim
     alias vim nvim
+end
+
+# abbreviations expand as you type, so history and pasted commands show the real command.
+# Staging stays by file name (no `git add -A`), see CLAUDE.md.
+abbr -a g git
+abbr -a gst 'git status'
+abbr -a ga 'git add'
+abbr -a gc 'git commit'
+abbr -a gd 'git diff'
+abbr -a gds 'git diff --staged'
+abbr -a gl 'git lg'
+abbr -a gp 'git push'
+abbr -a gpl 'git pull'
+abbr -a gf 'git fetch'
+abbr -a gsw 'git switch'
+abbr -a gsc 'git switch -c'
+# sudo !! reruns the last command
+abbr -a '!!' --position anywhere --function last_history_item
+
+type -q systemctl; and abbr -a sc systemctl; and abbr -a jc journalctl
+type -q kubectl; and abbr -a k kubectl
+type -q docker; and abbr -a dk docker
+
+# fzf pickers (functions/fzf_*.fish); the abbreviations are the short way to call them
+if type -q fzf
+    abbr -a fb fzf_git_branch
+    abbr -a fw fzf_git_worktree
+    abbr -a fsh fzf_ssh
+    type -q docker; and abbr -a fdk fzf_docker
+    type -q kubectl; and abbr -a fkx fzf_kube
+    type -q systemctl; and abbr -a fsd fzf_systemd
 end
 
 # zoxide (z, zi)
