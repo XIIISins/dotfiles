@@ -7,8 +7,8 @@ description: Organize the user's flat todo list at ~/.local/share/todo.md (or $T
 
 The list is one flat file, `~/.local/share/todo.md` (`$XDG_DATA_HOME/todo.md`
 if set), or `$TODO_FILE` if set. That variable lives in
-`config/fish/config-local.fish`, which a non-fish shell may not load, so grep
-it there before assuming the default. The user appends to it from a shell with `todo "idea"`, and other
+`~/.config/local/fish/config.fish` (or the old `config/fish/config-local.fish`),
+which a non-fish shell may not load, so grep it there before assuming the default. The user appends to it from a shell with `todo "idea"`, and other
 Claude sessions append and mark items too, so edit it carefully.
 
 ```

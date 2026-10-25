@@ -1,12 +1,21 @@
-# tracked; identity and signing are machine-specific and live in config.local (not tracked)
-[include]
-	path = config.local
+# tracked; identity, signing and anything else machine-specific live in ~/.config/local/git/config
+# (outside the repo, see config.local.example)
 
 [alias]
 	a = add
 	c = commit
+	co = checkout
 	d = diff
 	p = push
 	f = fetch
 	st = status
 	lg = log --oneline --graph --decorate --all
+
+[push]
+	autoSetupRemote = true
+
+# last, so machine-local settings win; a missing file is skipped. config.local is the old place,
+# still read until every machine has moved.
+[include]
+	path = config.local
+	path = ~/.config/local/git/config

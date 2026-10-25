@@ -1,4 +1,4 @@
-# copy to config.local (untracked) and fill in; included from ./config
+# copy to ~/.config/local/git/config (outside the repo) and fill in; included last from ./config
 [user]
 	name = Your Name
 	email = you@example.com
@@ -13,3 +13,12 @@
 
 [commit]
 	gpgsign = true
+
+# optional: another identity for every repo below a directory (keep the trailing slash),
+# e.g. personal repos on a work machine; the file holds just a [user] section
+[includeIf "gitdir:~/Development/personal/"]
+	path = ~/.config/local/git/personal
+
+# optional: machine-only ignore patterns. This replaces ./ignore, so repeat its patterns there.
+[core]
+	excludesFile = ~/.config/local/git/ignore
