@@ -67,10 +67,29 @@
   --channels-default: var(--tn-fg-dark);
 
   /* accent: blurple becomes the palette blue, with dark text on it */
-  --brand-500: var(--tn-blue);
+  /* the whole brand ramp, so no step stays blurple: light steps are text and links,
+     mid steps buttons, dark steps backgrounds */
+  --brand-230: var(--tn-cyan);
+  --brand-330: var(--tn-cyan);
+  --brand-345: var(--tn-cyan);
   --brand-360: var(--tn-blue);
   --brand-400: var(--tn-cyan);
+  --brand-430: var(--tn-blue);
+  --brand-460: var(--tn-blue);
+  --brand-500: var(--tn-blue);
+  --brand-530: var(--tn-blue);
   --brand-560: var(--tn-blue);
+  --brand-600: var(--tn-blue);
+  --brand-630: var(--tn-blue);
+  --brand-660: var(--tn-blue);
+  --brand-700: var(--tn-selection);
+  --brand-730: var(--tn-selection);
+  --brand-760: var(--tn-selection);
+  --brand-800: var(--tn-bg-highlight);
+  --brand-830: var(--tn-bg-highlight);
+  --brand-860: var(--tn-bg-highlight);
+  --brand-900: var(--tn-bg-dark);
+  --text-link-hover: var(--tn-cyan);
   --brand-experiment: var(--tn-blue);
   --brand-experiment-560: var(--tn-blue);
   --background-brand: var(--tn-blue);
