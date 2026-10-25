@@ -24,10 +24,13 @@
 }
 
 .theme-dark, .theme-darker, .theme-midnight {
-  /* surfaces: server list darkest, then channel list, then chat */
-  --background-base-lowest: var(--tn-black);
+  /* surfaces: server list and channel list on bg_dark (the palette's "sidebars"), chat on bg;
+     not black, which is what the palette's #000 would give */
+  --background-base-lowest: var(--tn-bg-dark);
   --background-base-lower: var(--tn-bg-dark);
   --background-base-low: var(--tn-bg-dark);
+  --app-frame-background: var(--tn-bg-dark);
+  --app-frame-border: var(--tn-fg-gutter);
   --background-surface-high: var(--tn-bg);
   --background-surface-higher: var(--tn-bg-highlight);
   --background-surface-highest: var(--tn-fg-gutter);
@@ -36,7 +39,7 @@
   --background-primary: var(--tn-bg);
   --background-secondary: var(--tn-bg-dark);
   --background-secondary-alt: var(--tn-bg-dark);
-  --background-tertiary: var(--tn-black);
+  --background-tertiary: var(--tn-bg-dark);
   --background-floating: var(--tn-bg-float);
   --background-accent: var(--tn-fg-gutter);
   --background-mod-subtle: var(--tn-bg-highlight);
@@ -70,6 +73,23 @@
   --brand-560: var(--tn-blue);
   --brand-experiment: var(--tn-blue);
   --brand-experiment-560: var(--tn-blue);
+  --background-brand: var(--tn-blue);
+  --text-brand: var(--tn-blue);
+  --control-brand-foreground: var(--tn-blue);
+  --control-brand-foreground-new: var(--tn-blue);
+  --control-primary-background-default: var(--tn-blue);
+  --control-primary-background-hover: var(--tn-cyan);
+  --control-primary-background-active: var(--tn-cyan);
+  --control-primary-text-default: var(--tn-bg-dark);
+  --control-primary-text-hover: var(--tn-bg-dark);
+  --control-primary-text-active: var(--tn-bg-dark);
+  --control-primary-border-default: var(--tn-blue);
+  --border-focus: var(--tn-blue);
+  --blurple-26: var(--tn-blue);
+  --blurple-36: var(--tn-blue);
+  --blurple-45: var(--tn-blue);
+  --blurple-50: var(--tn-blue);
+  --blurple-53: var(--tn-blue);
   --button-filled-brand-background: var(--tn-blue);
   --button-filled-brand-text: var(--tn-bg-dark);
   --mention-foreground: var(--tn-blue);
