@@ -1,3 +1,21 @@
+-- a machine can replace the dashboard header with $XDG_CONFIG_HOME/local/nvim/dashboard-header.txt,
+-- which lives outside the repo (e.g. the work banner). ":h" is lexical, so this is ~/.config and not
+-- the repo's config/ behind the nvim symlink.
+local function dashboard_header()
+	local path = vim.fn.fnamemodify(vim.fn.stdpath("config"), ":h") .. "/local/nvim/dashboard-header.txt"
+	if vim.fn.filereadable(path) == 1 then
+		return table.concat(vim.fn.readfile(path), "\n")
+	end
+	return [[
+██╗  ██╗██╗██╗██╗███████╗██╗███╗   ██╗███████╗
+╚██╗██╔╝██║██║██║██╔════╝██║████╗  ██║██╔════╝
+ ╚███╔╝ ██║██║██║███████╗██║██╔██╗ ██║███████╗
+ ██╔██╗ ██║██║██║╚════██║██║██║╚██╗██║╚════██║
+██╔╝ ██╗██║██║██║███████║██║██║ ╚████║███████║
+╚═╝  ╚═╝╚═╝╚═╝╚═╝╚══════╝╚═╝╚═╝  ╚═══╝╚══════╝
+   ]]
+end
+
 return {
 	-- messages, cmdline and the popupmenu
 	{
@@ -145,14 +163,7 @@ return {
 			scroll = { enabled = false },
 			dashboard = {
 				preset = {
-					header = [[
-██╗  ██╗██╗██╗██╗███████╗██╗███╗   ██╗███████╗
-╚██╗██╔╝██║██║██║██╔════╝██║████╗  ██║██╔════╝
- ╚███╔╝ ██║██║██║███████╗██║██╔██╗ ██║███████╗
- ██╔██╗ ██║██║██║╚════██║██║██║╚██╗██║╚════██║
-██╔╝ ██╗██║██║██║███████║██║██║ ╚████║███████║
-╚═╝  ╚═╝╚═╝╚═╝╚═╝╚══════╝╚═╝╚═╝  ╚═══╝╚══════╝
-   ]],
+					header = dashboard_header(),
 				},
 			},
 		},

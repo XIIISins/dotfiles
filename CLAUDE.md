@@ -79,6 +79,8 @@ only) when a task needs something that is only there:
   functions).
 - Check `.gitignore` before adding a new file under `config/fish/`, since
   most of its `functions/` and `conf.d/` files are plugin-managed.
+- New per-machine overrides go in `$XDG_CONFIG_HOME/local/<tool>/` (outside
+  the repo, read by the config if present), not in a new gitignored file.
 - Never commit credentials or app state (`gh`, `op`, `1Password`, `rclone`,
   `envman`, `raycast`, ...). Use `config.local` or 1Password instead.
 
