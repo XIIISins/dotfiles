@@ -7,6 +7,7 @@
 #   unlink  replace the symlink with a real copy of the repo files
 #   status  show what is linked
 #   hooks   re-run the post-link steps of linked packages (they only run on a fresh link)
+#           (link and hooks also enable the repo's git pre-commit hook)
 #   -n      dry run, change nothing
 #   --server  check out the `server` branch (bash, tmux, nvim, git only) and run its
 #           install.sh instead; for a fresh clone on a server, not for a checkout that is
@@ -250,14 +251,14 @@ switch_to_server() {
     exec "$repo/install.sh" "$cmd" "$@"
 }
 
-cmd=link
+cmd='link'
 while [ $# -gt 0 ]; do
     case $1 in
         -n | --dry-run) dry=1 ;;
         --server) server=1 ;;
         link | unlink | status | hooks) cmd=$1 ;;
         -h | --help)
-            sed -n '2,13p' "$0"
+            sed -n '2,14p' "$0"
             exit 0
             ;;
         *) break ;;
@@ -288,3 +289,8 @@ done
 for pkg in $selected; do
     "${cmd}_pkg" "$pkg"
 done
+
+# the repo's own pre-commit hook (.githooks/); core.hooksPath is shared by all worktrees
+if [ -d "$repo/.githooks" ] && { [ "$cmd" = link ] || [ "$cmd" = hooks ]; }; then
+    soft git -C "$repo" config core.hooksPath .githooks
+fi
