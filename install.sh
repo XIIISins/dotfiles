@@ -166,7 +166,7 @@ status_pkg() {
     fi
 }
 
-cmd=link
+cmd='link'
 while [ $# -gt 0 ]; do
     case $1 in
         -n | --dry-run) dry=1 ;;
@@ -199,3 +199,8 @@ done
 for pkg in $selected; do
     "${cmd}_pkg" "$pkg"
 done
+
+# the repo's own pre-commit hook (.githooks/); core.hooksPath is shared by all worktrees
+if [ -d "$repo/.githooks" ] && { [ "$cmd" = link ] || [ "$cmd" = hooks ]; }; then
+    soft git -C "$repo" config core.hooksPath .githooks
+fi

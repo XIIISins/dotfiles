@@ -1,0 +1,127 @@
+#!/bin/sh
+# Pre-commit: gitleaks on the staged changes, then a linter per language on
+# the staged files. A linter that is not installed is skipped with a notice,
+# so the hook works on any machine. `.githooks/pre-commit --all` lints every
+# tracked file instead of only the staged ones. Enable it with
+# `git config core.hooksPath .githooks` (install.sh does this on link).
+
+set -u
+
+root=$(git rev-parse --show-toplevel) || exit 1
+cd "$root" || exit 1
+
+if [ "${1:-}" = "--all" ]; then
+    files=$(git ls-files)
+else
+    files=$(git diff --cached --name-only --diff-filter=ACMR)
+fi
+[ -n "$files" ] || exit 0
+
+failed=0
+
+have() {
+    command -v "$1" >/dev/null 2>&1 && return 0
+    echo "pre-commit: $1 not installed, skipping $2" >&2
+    return 1
+}
+
+# Run a check; a failure marks the commit as rejected but the remaining
+# checks still run, so one commit attempt reports everything.
+run() {
+    "$@" || failed=1
+}
+
+# Staged paths matching a grep -E pattern, NUL-free but newline separated.
+match() {
+    printf '%s\n' "$files" | grep -E "$1" || true
+}
+
+# Every tracked path matching a pattern, passed to a command one at a time.
+each() {
+    pattern=$1
+    shift
+    match "$pattern" | while IFS= read -r f; do
+        [ -f "$f" ] || continue
+        "$@" "$f" || exit 1
+    done
+}
+
+# Secrets: only meaningful for staged content.
+if [ "${1:-}" != "--all" ]; then
+    if have gitleaks "secret scan"; then
+        run gitleaks git --staged --no-banner --redact -v
+    fi
+else
+    have gitleaks "secret scan" && run gitleaks git --no-banner --redact -v
+fi
+
+# Shell: *.sh, extensionless scripts with an sh shebang.
+is_shell() {
+    case $1 in
+    *.sh) return 0 ;;
+    *.*) return 1 ;;
+    esac
+    head -n1 "$1" 2>/dev/null | grep -qE '^#!.*[/ ](ba|da|k)?sh([[:space:]]|$)'
+}
+# Generated palette outputs are covered by `render --check` below.
+shells=$(printf '%s\n' "$files" | grep -v '^config/palette/out/' | while IFS= read -r f; do
+    [ -f "$f" ] && is_shell "$f" && echo "$f"
+done)
+if [ -n "$shells" ] && have shellcheck "shell scripts"; then
+    # -S warning: info-level notes (e.g. not following sourced files) are noise.
+    # shellcheck disable=SC2086 # one path per line, none contain spaces
+    run shellcheck -x -S warning $shells
+fi
+
+# Fish: formatting and syntax.
+if [ -n "$(match '\.fish$')" ] && have fish_indent "fish files"; then
+    each '\.fish$' fish_indent --check >/dev/null || {
+        echo "pre-commit: fish files need formatting (fish_indent -w <file>)" >&2
+        failed=1
+    }
+    each '\.fish$' fish --no-execute || failed=1
+fi
+
+# Lua (nvim, hammerspoon): syntax only. luajit matches nvim's runtime.
+if [ -n "$(match '\.lua$')" ] && have luajit "lua files"; then
+    each '\.lua$' luajit -bl >/dev/null || failed=1
+fi
+
+# JSON (jsonc and the tmux layouts file are not strict JSON, so skipped).
+if [ -n "$(match '\.json$')" ] && have jq "json files"; then
+    each '\.json$' jq empty || failed=1
+fi
+
+# YAML.
+if [ -n "$(match '\.ya?ml$')" ] && have yamllint "yaml files"; then
+    each '\.ya?ml$' yamllint -d relaxed || failed=1
+fi
+
+# Userscripts: user.js is plain JS.
+if [ -n "$(match '\.js$')" ] && have node "js files"; then
+    each '\.js$' node --check || failed=1
+fi
+
+# TypeScript: type-check the usage-band mod against its tsconfig.
+if [ -n "$(match '^config/claude-mods/usage-band/')" ] && have tsc "usage-band typecheck"; then
+    run tsc --noEmit -p config/claude-mods/usage-band
+fi
+
+# Generated palette outputs must match the palette and templates.
+if [ -n "$(match '^config/palette/')" ]; then
+    run config/palette/render --check
+fi
+
+# tmux: parse the config in a throwaway server.
+if [ -n "$(match '^config/tmux/.*\.conf$')" ] && have tmux "tmux config"; then
+    sock="pre-commit-$$"
+    if ! tmux -L "$sock" -f /dev/null start-server \; source-file -n config/tmux/tmux.conf 2>&1; then
+        failed=1
+    fi
+    tmux -L "$sock" kill-server 2>/dev/null
+fi
+
+if [ "$failed" -ne 0 ]; then
+    echo "pre-commit: checks failed, commit aborted" >&2
+    exit 1
+fi

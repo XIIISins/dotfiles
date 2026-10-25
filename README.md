@@ -15,12 +15,17 @@ cd ~/dotfiles
 ./install.sh -n          # dry run: shows what would be backed up and linked
 ./install.sh             # link everything (existing dirs are backed up)
 ./install.sh status      # what is linked
-./install.sh hooks       # re-run post-link steps (the ~/.bashrc source line)
+./install.sh hooks       # re-run post-link steps (the ~/.bashrc source line, the git hook)
 ./install.sh unlink tmux # replace the symlink with a real copy of the files
 ```
 
 Existing directories are moved to `<name>.bak-<timestamp>`. Each `config/<name>` is symlinked
 into `$XDG_CONFIG_HOME` (default `~/.config`), so editing a live config edits the repo.
+
+`link` and `hooks` also set `core.hooksPath` to `.githooks`, which enables the pre-commit hook:
+gitleaks on the staged changes, then per language on the staged files: shellcheck (sh), `luajit -bl`
+(lua), `jq` (json), yamllint (yaml), `palette/render --check` and a `tmux source-file -n` parse.
+A missing tool is skipped with a notice. `.githooks/pre-commit --all` checks every tracked file.
 
 ## Layout
 
