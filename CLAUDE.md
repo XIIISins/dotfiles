@@ -140,8 +140,10 @@ only) when a task needs something that is only there:
 - Commit messages follow Conventional Commits and do not include a
   `Co-Authored-By` trailer.
 - Before every commit, stage the changes and run
-  `gitleaks git --staged --no-banner --redact -v`. Do not commit if it
-  reports a leak; remove the secret (and tell the user if it was already
+  `gitleaks git --staged --no-banner --redact -v`. The pre-commit hook
+  (`.githooks/`, enabled by `install.sh`) runs it too, plus the linters
+  (see `README.md` "Use"); fix what it reports, never bypass it with
+  `--no-verify`. Do not commit if gitleaks reports a leak; remove the secret (and tell the user if it was already
   committed or pushed) instead of allowlisting it.
 - Shipping a change (when asked) goes through a PR, never a direct push to
   `main`. Automerge is off, so merge by hand:

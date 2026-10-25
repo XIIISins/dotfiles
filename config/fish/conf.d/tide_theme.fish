@@ -52,9 +52,9 @@ end
 
 # tool items: one palette accent per tool, dark text
 for pair in aws:orange crystal:fg_dark direnv:yellow distrobox:magenta docker:blue \
-        elixir:magenta gcloud:blue go:cyan java:orange kubectl:blue nix_shell:cyan \
-        node:green php:magenta private_mode:fg pulumi:yellow python:yellow \
-        ruby:red rustc:orange shlvl:yellow terraform:magenta toolbox:magenta zig:yellow
+    elixir:magenta gcloud:blue go:cyan java:orange kubectl:blue nix_shell:cyan \
+    node:green php:magenta private_mode:fg pulumi:yellow python:yellow \
+    ruby:red rustc:orange shlvl:yellow terraform:magenta toolbox:magenta zig:yellow
     set -l item (string split : $pair)
     set -l accent tn_$item[2]
     set -g tide_{$item[1]}_bg_color $$accent

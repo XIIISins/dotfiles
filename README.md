@@ -22,6 +22,12 @@ branches would rewrite the live configs.
 
 Existing directories are moved to `<name>.bak-<timestamp>`.
 
+`link` and `hooks` also set `core.hooksPath` to `.githooks`, which enables the pre-commit hook: gitleaks
+on the staged changes, then per language on the staged files: shellcheck (sh), `fish_indent --check` and
+`fish -n` (fish), `luajit -bl` (lua), `jq` (json), yamllint (yaml), `node --check` (js), `tsc` (usage-band),
+`palette/render --check` and a `tmux source-file -n` parse. A missing tool is skipped with a notice.
+`.githooks/pre-commit --all` checks every tracked file.
+
 `hammerspoon`, `karabiner` and `zen` are skipped outside macOS. On first link,
 machine-local files that are gitignored (fish_variables, tmux plugins,
 symlinks into other repos, ...) are copied from the old directory into the
