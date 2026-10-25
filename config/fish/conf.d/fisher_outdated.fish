@@ -7,13 +7,13 @@ set -l cache (set -q XDG_CACHE_HOME; and echo $XDG_CACHE_HOME; or echo $HOME/.ca
 mkdir -p (dirname $cache)
 
 if test -s $cache
-  echo "fish plugin updates (bump fish_plugins, then fisher update):"
-  string replace -r '^' '  ' < $cache
+    echo "fish plugin updates (bump fish_plugins, then fisher update):"
+    string replace -r '^' '  ' <$cache
 end
 
 # find prints the file only when it is older than 7 days
 if not test -f $cache.stamp; or test -n "$(find $cache.stamp -mtime +7)"
-  touch $cache.stamp
-  fish -c "fisher_outdated > $cache" >/dev/null 2>&1 &
-  disown
+    touch $cache.stamp
+    fish -c "fisher_outdated > $cache" >/dev/null 2>&1 &
+    disown
 end
