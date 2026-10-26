@@ -61,7 +61,8 @@ repo directory so nothing breaks. The backup stays complete.
   `~/.config/local/fish/netbox-token` (`Bearer <token>`, mode 600), both
   machine-local. An optional `~/.config/local/fish/netbox-ssh-roles` adds
   ssh settings (`[role=dns]` or `[name=host]` sections of `User`,
-  `IdentitiesOnly`, ...) to the matching entries; see `netbox_ssh help`.
+  `IdentitiesOnly`, ...) to the matching entries, and a bare `Skip` leaves
+  the host out; see `netbox_ssh help`.
 - `tmux`: plugins are installed by tpm; `tmux.conf` clones tpm and installs
   them on a fresh machine (needs git). `notify.sh` is the notch-style
   notification popup. `layouts.sh` is the named layout selector (prefix `a`

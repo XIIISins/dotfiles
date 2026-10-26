@@ -19,6 +19,7 @@ optional $rolesfile adds ssh settings to the generated entries:
     User root         the lines below are ssh_config lines
     IdentitiesOnly no
 name= lines come before role= lines, so ssh (first value wins) prefers them.
+A bare Skip line leaves the host out of the file.
 IdentityAgent is ignored: ~/.ssh/config.d/90-operator-agent owns it."
         return
     end
@@ -68,14 +69,20 @@ IdentityAgent is ignored: ~/.ssh/config.d/90-operator-agent owns it."
 
         for row in $rows
             set -l f (string split \t -- $row)
-            # the role/site comment is what a grouped picker can key on
-            printf '\n# role=%s site=%s\nHost %s\n\tHostName %s\n' $f[2] $f[3] $f[1] $f[4] >>$tmp
+            set -l settings
             if test -r $rolesfile
                 # name= section first, then role=; awk drops IdentityAgent and comments
                 for key in name=$f[1] role=$f[2]
-                    awk -v key="[$key]" '/^\[/ { on = ($0 == key); next }
-                        on && NF && $1 !~ /^#/ && tolower($1) != "identityagent" { print "\t" $0 }' $rolesfile >>$tmp
+                    set -a settings (awk -v key="[$key]" '/^\[/ { on = ($0 == key); next }
+                        on && NF && $1 !~ /^#/ && tolower($1) != "identityagent" { print $0 }' $rolesfile)
                 end
+            end
+            # a bare Skip line leaves the host out, e.g. a firewall that is not reached over ssh
+            contains -- Skip $settings; and continue
+            # the role/site comment is what a grouped picker can key on
+            printf '\n# role=%s site=%s\nHost %s\n\tHostName %s\n' $f[2] $f[3] $f[1] $f[4] >>$tmp
+            for line in $settings
+                printf '\t%s\n' $line >>$tmp
             end
         end
     end
