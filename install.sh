@@ -21,7 +21,7 @@ os=$(uname -s)
 dry=0
 server=0
 
-packages="fish tmux ghostty hammerspoon karabiner nvim lazygit git palette claude-mods fastfetch zen btop spicetify"
+packages="fish tmux ghostty hammerspoon karabiner nvim lazygit git palette claude-mods fastfetch zen btop spicetify bat"
 
 # packages that only make sense on one OS (uname -s); empty means everywhere
 only_on() {
@@ -148,6 +148,12 @@ hook() {
         palette)
             obsidian_snippets
             vesktop_theme
+            ;;
+        bat)
+            # bat only sees themes after its cache is rebuilt
+            if command -v bat >/dev/null 2>&1; then
+                soft bat cache --build
+            fi
             ;;
         claude-mods)
             # plugins live in ~/.claude, not ~/.config: register the linked

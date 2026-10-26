@@ -109,6 +109,8 @@ repo directory so nothing breaks. The backup stays complete.
   Tampermonkey, Tab Session Manager, BetterTTV, Proton VPN, a new tab URL
   extension).
 - `btop`, `spicetify`: the TokyoNight Moon theme only; see Theming.
+- `bat`: `config` (theme, style) and tokyonight.nvim's Moon `.tmTheme`. Linking
+  runs `bat cache --build`; bat ignores a theme until the cache is rebuilt.
 - `nvim`: LazyVim. The dashboard header is read from
   `~/.config/local/nvim/dashboard-header.txt` if it exists (see Not
   tracked), otherwise it is the built-in one.
@@ -159,6 +161,9 @@ supply the Ghostty theme.
   hex literals. The diff backgrounds come from tokyonight.nvim's delta extra,
   since the palette has no blended colours; line numbers and headers use the
   palette. Syntax colours are bat's default theme (bat has no TokyoNight).
+- bat: `config/bat/themes/tokyonight_moon.tmTheme` (the sublime extra from
+  tokyonight.nvim), selected in `config/bat/config`. fzf.fish file previews
+  use it through `fzf_preview_file_cmd` in `config.fish`.
 - btop: `config/btop/themes/tokyonight-moon.theme`. `btop.conf` is untracked
   (btop rewrites it), so pick the theme once in btop (`esc`, Options, Color
   theme).
