@@ -1,15 +1,19 @@
 function fzf_systemd
     # pick a service, then act on it: status (default), logs (follow), restart, stop
-    # or edit. Add --user for the user manager: `fzf_systemd logs --user`
+    # or edit. Add --user (anywhere) for the user manager: `fzf_systemd logs --user`
+    set -l scope --system
+    if set -l i (contains -i -- --user $argv)
+        set scope --user
+        set -e argv[$i]
+    end
+
     set -l action status
     set -q argv[1]; and set action $argv[1]
-    if not contains -- $action status logs restart stop edit
+    if set -q argv[2]; or not contains -- $action status logs restart stop edit
         echo "usage: fzf_systemd [status|logs|restart|stop|edit] [--user]" >&2
         return 1
     end
 
-    set -l scope --system
-    set -q argv[2]; and set scope $argv[2]
     set -l sudo sudo
     test $scope = --user; and set sudo
 
