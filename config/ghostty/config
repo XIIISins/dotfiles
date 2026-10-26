@@ -1,6 +1,8 @@
 # Imports
 
 config-file = ~/.config/ghostty/keybinds
+# machine-local overrides (outside the repo); ? skips a missing file, and config-file entries load after this file
+config-file = ?~/.config/local/ghostty/config
 
 # Aesthetics
 ## Fonts

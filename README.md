@@ -237,7 +237,11 @@ Extra values in the palette file that are not in the base palette (used by tmux 
 - `tmux/plugins/`, `karabiner/automatic_backups/`: third-party or generated.
 - `~/.config/local/<tool>/`: per-machine overrides that should not be in a
   public repo: `fish/config.fish`, `git/config` (identity, signing,
-  credentials) and `nvim/dashboard-header.txt` (e.g. a work banner). It is
+  credentials), `tmux/tmux.conf` (sourced before tpm runs, so it can add
+  `@plugin` lines), `ghostty/config` (loaded after the tracked config, so it
+  wins) and `nvim/dashboard-header.txt` (e.g. a work banner). For ssh, keep
+  per-host files in `ssh/` and add `Include ~/.config/local/ssh/*` to
+  `~/.ssh/config` (not tracked); `fzf_ssh_host` follows the Include. It is
   not a package, so `install.sh` never links or backs it up; create it by
   hand. `fish/config-local.fish` and `git/config.local` in the repo are the
   old places, still read and ignored until every machine has moved.
