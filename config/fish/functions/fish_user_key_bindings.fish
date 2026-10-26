@@ -1,6 +1,8 @@
 function fish_user_key_bindings
     # fzf
     bind \cf fzf_change_directory
+    # ssh host picker; replaces pager search, which the widget still does in the pager
+    bind \cs fzf_ssh_widget
     fzf_configure_bindings --directory=\co
 
     # ctrl-h is not backspace (the backspace key sends ^?, so only ctrl-h is affected)

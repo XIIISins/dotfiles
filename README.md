@@ -45,6 +45,12 @@ repo directory so nothing breaks. The backup stays complete.
   on the next start. Plugin files are not tracked: on a fresh machine the
   first interactive shell installs fisher (pinned), runs `fisher update`,
   applies `tide-settings.fish` and restarts. Needs `curl`, `git` and network.
+  Abbreviations (git, `!!`) are in `config.fish` and need
+  fish 3.6+. The `fzf_*` functions are fzf pickers with a short abbreviation
+  each: `fb` git branch, `fw` git worktree, `fsh` ssh host (from
+  `~/.ssh/config` and the files it `Include`s). Ctrl+S picks an ssh host too: on an empty
+  line it runs `ssh <host>`, otherwise it inserts the host at the cursor
+  (`scp file <C-s>:/tmp`).
 - `tmux`: plugins are installed by tpm; `tmux.conf` clones tpm and installs
   them on a fresh machine (needs git). `notify.sh` is the notch-style
   notification popup. `layouts.sh` is the named layout selector (prefix `a`
