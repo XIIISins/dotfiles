@@ -48,7 +48,7 @@ repo directory so nothing breaks. The backup stays complete.
   Abbreviations (git, `!!`) are in `config.fish` and need
   fish 3.6+. The `fzf_*` functions are fzf pickers with a short abbreviation
   each: `fb` git branch, `fw` git worktree, `fsh` ssh host (from
-  `~/.ssh/config` and `config.d/`). Ctrl+S picks an ssh host too: on an empty
+  `~/.ssh/config` and the files it `Include`s). Ctrl+S picks an ssh host too: on an empty
   line it fills in `ssh <host>`, otherwise it inserts the host at the cursor
   (`scp file <C-s>:/tmp`).
 - `tmux`: plugins are installed by tpm; `tmux.conf` clones tpm and installs
