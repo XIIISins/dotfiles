@@ -53,7 +53,8 @@ repo directory so nothing breaks. The backup stays complete.
   Abbreviations (git, `!!`) are in `config.fish` and need
   fish 3.6+. The `fzf_*` functions are fzf pickers with a short abbreviation
   each: `fb` git branch, `fw` git worktree, `fsh` ssh host (from
-  `~/.ssh/config` and the files it `Include`s). Ctrl+S picks an ssh host too: on an empty
+  `~/.ssh/config` and the files it `Include`s; grouped by the `role=` comment
+  `netbox_ssh` writes, or `site=` / `none` via `FZF_SSH_GROUP_BY`). Ctrl+S picks an ssh host too: on an empty
   line it runs `ssh <host>`, otherwise it inserts the host at the cursor
   (`scp file <C-s>:/tmp`). `netbox_ssh` rewrites `~/.ssh/config.d/netbox`
   with a `Host` per active NetBox device and VM (primary IP, plus a `role=` /
