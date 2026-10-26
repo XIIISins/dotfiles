@@ -1,0 +1,1 @@
+{ "name": "ship", "version": "0.1.0", "description": "Ship a change: gitleaks, Conventional Commits branch and commit, PR, merge, then branch and worktree cleanup" }

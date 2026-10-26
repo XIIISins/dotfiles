@@ -84,7 +84,9 @@ repo directory so nothing breaks. The backup stays complete.
   runs `claude plugin marketplace add` and `claude plugin install` for it
   (needs `claude` on the PATH, and a fresh link; otherwise run the same two
   commands by hand). `usage-band` draws context, rate-limit and cost bars
-  above the prompt in the palette colours. The installed copy is a snapshot:
+  above the prompt in the palette colours. `ship` adds `/ship:ship`, the
+  shipping routine from `CLAUDE.md` (gitleaks, branch, PR, merge, branch and
+  worktree cleanup); only typing it runs it. The installed copy is a snapshot:
   after editing, `claude plugin update usage-band@xiiisins-mods` and restart.
   `usage-band/.claude-plugin/types/` (what `tsconfig.json` extends) is written by
   Claude Code and gitignores itself, so typechecking works only where Claude Code
