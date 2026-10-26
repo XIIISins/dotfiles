@@ -37,10 +37,6 @@ abbr -a gsc 'git switch -c'
 # sudo !! reruns the last command
 abbr -a '!!' --position anywhere --function last_history_item
 
-type -q systemctl; and abbr -a sc systemctl; and abbr -a jc journalctl
-type -q kubectl; and abbr -a k kubectl
-type -q docker; and abbr -a dk docker
-
 # fzf pickers (functions/fzf_*.fish); the abbreviations are the short way to call them
 if type -q fzf
     abbr -a fb fzf_git_branch

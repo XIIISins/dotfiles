@@ -45,7 +45,7 @@ repo directory so nothing breaks. The backup stays complete.
   on the next start. Plugin files are not tracked: on a fresh machine the
   first interactive shell installs fisher (pinned), runs `fisher update`,
   applies `tide-settings.fish` and restarts. Needs `curl`, `git` and network.
-  Abbreviations (git, systemctl, docker, kubectl) are in `config.fish` and need
+  Abbreviations (git, `!!`) are in `config.fish` and need
   fish 3.6+. The `fzf_*` functions are fzf pickers with a short abbreviation
   each: `fb` git branch, `fw` git worktree, `fsh` ssh host (from
   `~/.ssh/config` and `config.d/`).
