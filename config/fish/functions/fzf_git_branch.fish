@@ -8,7 +8,7 @@ function fzf_git_branch
     set -l branch (git for-each-ref --sort=-committerdate --format='%(refname)' refs/heads refs/remotes \
         | string match -v -r '/HEAD$' \
         | string replace -r '^refs/(heads|remotes)/' '' \
-        | fzf --height 40% --reverse --prompt 'branch> ' \
+        | fzf --prompt 'Branch> ' \
             --preview 'git log --oneline --color=always -20 {}')
     test -n "$branch"; or return
 

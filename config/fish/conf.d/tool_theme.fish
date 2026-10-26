@@ -4,8 +4,10 @@ set -l palette (path resolve (status dirname)/../../palette)/out/tokyonight-moon
 test -f $palette; or return
 source $palette
 
-# bg is -1 (terminal default) so ghostty's background shows through, like nvim
-set -gx FZF_DEFAULT_OPTS "--color=fg:#$tn_fg,bg:-1,hl:#$tn_blue,fg+:#$tn_fg,bg+:#$tn_selection,hl+:#$tn_cyan,info:#$tn_yellow,prompt:#$tn_cyan,pointer:#$tn_cyan,marker:#$tn_green,spinner:#$tn_orange,header:#$tn_orange,border:#$tn_fg_gutter,gutter:-1"
+# bg is -1 (terminal default) so ghostty's background shows through, like nvim.
+# The layout is here too: setting FZF_DEFAULT_OPTS makes fzf.fish skip its own defaults, so
+# every picker (ctrl+s/f/o, fb, fw) shares this one look instead of choosing its own
+set -gx FZF_DEFAULT_OPTS "--cycle --layout=reverse --border --height=60% --preview-window=wrap --marker=* --color=fg:#$tn_fg,bg:-1,hl:#$tn_blue,fg+:#$tn_fg,bg+:#$tn_selection,hl+:#$tn_cyan,info:#$tn_yellow,prompt:#$tn_cyan,pointer:#$tn_cyan,marker:#$tn_green,spinner:#$tn_orange,header:#$tn_orange,border:#$tn_fg_gutter,gutter:-1"
 
 # eza: SGR truecolor per file type and column, only where the default clashes with the palette
 set -l c 38\;2\;

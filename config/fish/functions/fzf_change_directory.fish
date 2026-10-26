@@ -10,7 +10,7 @@ function fzf_change_directory
     if test -d $HOME/Dev
       find $HOME/Dev -mindepth 2 -maxdepth 2 -type d ! -name '.*'
     end
-  end | awk '!a[$0]++' | fzf $argv)
+  end | awk '!a[$0]++' | fzf --prompt 'Change Dir> ' $argv)
 
     # keep what was typed: cancelling must not wipe the command line
     test -n "$dir"; and builtin cd -- $dir
