@@ -1,0 +1,5 @@
+# TokyoNight Moon: themes/tokyonight_moon.tmTheme is folke/tokyonight.nvim's sublime extra
+# (bat needs `bat cache --build` after it changes; install.sh does it)
+--theme="tokyonight_moon"
+# no grid or header: bat is mostly the fzf file preview, and the file name is already on screen
+--style="numbers,changes"
