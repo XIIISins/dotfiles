@@ -157,6 +157,7 @@ hook() {
                 soft claude plugin install usage-band@xiiisins-mods
                 soft claude plugin install tokyonight-moon@xiiisins-mods
                 soft claude plugin install todo@xiiisins-mods
+                soft claude plugin install ship@xiiisins-mods
             else
                 echo "claude-mods: claude not found; later run: claude plugin marketplace add $dest/claude-mods"
             fi

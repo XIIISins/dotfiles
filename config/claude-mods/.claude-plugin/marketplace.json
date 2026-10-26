@@ -18,6 +18,11 @@
       "name": "todo",
       "source": "./todo",
       "description": "Tag, dedupe and triage the flat todo list at ~/.local/share/todo.md"
+    },
+    {
+      "name": "ship",
+      "source": "./ship",
+      "description": "Ship a change: gitleaks, Conventional Commits branch and commit, PR, merge, then branch and worktree cleanup"
     }
   ]
 }
