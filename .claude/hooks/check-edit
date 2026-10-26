@@ -1,0 +1,48 @@
+#!/bin/sh
+# Claude Code PostToolUse hook (.claude/settings.json): after an edit in this
+# repo, lint the file with the pre-commit checks (`--files`, so render --check
+# for the palette too), and for a file under config/<pkg>/ check that install.sh
+# knows the package. Exit 2 hands the output to Claude; a pass stays quiet.
+
+command -v jq >/dev/null 2>&1 || exit 0
+file=$(jq -r '.tool_input.file_path // empty')
+[ -n "$file" ] && [ -f "$file" ] || exit 0
+
+# physical paths, so an edit through ~/.config/<pkg> still maps into the repo
+dir=$(cd "$(dirname "$file")" 2>/dev/null && pwd -P) || exit 0
+root=$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null) || exit 0
+
+# only this repo (any of its worktrees), not another repo edited from a session here
+common() {
+    git -C "$1" rev-parse --path-format=absolute --git-common-dir 2>/dev/null
+}
+[ "$(common "$root")" = "$(common "$(dirname "$0")")" ] || exit 0
+
+rel=${dir#"$root"}/$(basename "$file")
+rel=${rel#/}
+# machine-local and plugin-managed files are not ours to lint
+git -C "$root" check-ignore -q -- "$rel" && exit 0
+
+checks() {
+    cd "$root" || return 1
+    failed=0
+    case $rel in
+    config/*/*)
+        pkg=${rel#config/}
+        pkg=${pkg%%/*}
+        # ignore what -n would link: in a worktree that is every package
+        if ! msg=$(./install.sh -n "$pkg" 2>&1); then
+            printf '%s\n' "$msg"
+            echo "config/$pkg: add it to packages in install.sh (and only_on/local_paths if needed)"
+            failed=1
+        fi
+        ;;
+    esac
+    .githooks/pre-commit --files "$rel" || failed=1
+    return $failed
+}
+
+out=$(checks 2>&1) && exit 0
+
+printf 'checks failed for %s:\n%s\n' "$rel" "$out" >&2
+exit 2

@@ -28,6 +28,11 @@ on the staged changes, then per language on the staged files: shellcheck (sh), `
 `palette/render --check` and a `tmux source-file -n` parse. A missing tool is skipped with a notice.
 `.githooks/pre-commit --all` checks every tracked file.
 
+Claude Code runs the same checks on every file it edits (`.claude/settings.json`, a PostToolUse hook
+calling `.claude/hooks/check-edit`, which runs `.githooks/pre-commit --files <path>`; no gitleaks until
+the commit), and for a file under `config/<name>/` it also checks that `install.sh` lists the package.
+A failure goes back to Claude to fix; a pass is silent.
+
 `hammerspoon`, `karabiner` and `zen` are skipped outside macOS. On first link,
 machine-local files that are gitignored (fish_variables, tmux plugins,
 symlinks into other repos, ...) are copied from the old directory into the
