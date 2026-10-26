@@ -89,3 +89,10 @@ config/fish/functions/fzf_configure_bindings.fish
 config/fish/functions/nvm.fish
 config/fish/functions/tide
 config/fish/functions/tide.fish
+
+# Claude Code: the project settings and their hooks are shared, the rest (worktrees,
+# settings.local.json) is per machine; some global gitignores exclude .claude entirely
+!.claude/
+.claude/*
+!.claude/settings.json
+!.claude/hooks/

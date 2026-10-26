@@ -2,7 +2,9 @@
 # Pre-commit: gitleaks on the staged changes, then a linter per language on
 # the staged files. A linter that is not installed is skipped with a notice,
 # so the hook works on any machine. `.githooks/pre-commit --all` lints every
-# tracked file instead of only the staged ones. Enable it with
+# tracked file instead of only the staged ones, and `--files <path>...` (paths
+# relative to the repo root) only those, without the secret scan; Claude
+# Code's edit hook (.claude/hooks/check-edit) uses that. Enable it with
 # `git config core.hooksPath .githooks` (install.sh does this on link).
 
 set -u
@@ -10,11 +12,20 @@ set -u
 root=$(git rev-parse --show-toplevel) || exit 1
 cd "$root" || exit 1
 
-if [ "${1:-}" = "--all" ]; then
-    files=$(git ls-files)
-else
-    files=$(git diff --cached --name-only --diff-filter=ACMR)
-fi
+mode=staged
+case ${1:-} in
+--all) mode=all ;;
+--files)
+    mode=files
+    shift
+    ;;
+esac
+
+case $mode in
+all) files=$(git ls-files) ;;
+files) files=$(printf '%s\n' "$@") ;;
+*) files=$(git diff --cached --name-only --diff-filter=ACMR) ;;
+esac
 [ -n "$files" ] || exit 0
 
 failed=0
@@ -46,12 +57,13 @@ each() {
     done
 }
 
-# Secrets: only meaningful for staged content.
-if [ "${1:-}" != "--all" ]; then
+# Secrets: only meaningful for staged content (or the whole history); an
+# edited file is scanned once it is committed.
+if [ "$mode" = staged ]; then
     if have gitleaks "secret scan"; then
         run gitleaks git --staged --no-banner --redact -v
     fi
-else
+elif [ "$mode" = all ]; then
     have gitleaks "secret scan" && run gitleaks git --no-banner --redact -v
 fi
 
@@ -122,6 +134,10 @@ if [ -n "$(match '^config/tmux/.*\.conf$')" ] && have tmux "tmux config"; then
 fi
 
 if [ "$failed" -ne 0 ]; then
-    echo "pre-commit: checks failed, commit aborted" >&2
+    if [ "$mode" = files ]; then
+        echo "pre-commit: checks failed" >&2
+    else
+        echo "pre-commit: checks failed, commit aborted" >&2
+    fi
     exit 1
 fi

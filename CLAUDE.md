@@ -64,6 +64,9 @@ only) when a task needs something that is only there:
 ## Testing and applying changes
 
 - Check linking with `./install.sh -n` (dry run) and `./install.sh status`.
+- Every edit runs the pre-commit linters on that file (and, under
+  `config/<name>/`, checks `install.sh` lists the package) through the hook in
+  `.claude/settings.json`. Fix what it reports before moving on.
 - Do not run `./install.sh` (without `-n`) unless asked: it moves existing
   directories to `<name>.bak-<timestamp>`.
 - You cannot reload the user's live tmux, nvim or fish sessions. Say what
