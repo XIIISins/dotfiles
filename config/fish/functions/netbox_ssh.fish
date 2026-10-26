@@ -1,15 +1,25 @@
 function netbox_ssh
     # rewrite ~/.ssh/config.d/netbox with a Host entry (name -> primary IP) for every active
-    # NetBox device and VM (other statuses are decommissioned or not in use). Needs NETBOX_URL and the file ~/.config/local/fish/netbox-token
-    # (holds "Bearer <token>"), both machine-local, see ~/.config/local/fish/config.fish
+    # NetBox device and VM (other statuses are decommissioned or not in use). Needs
+    # NETBOX_URL and the file ~/.config/local/fish/netbox-token (holds "Bearer <token>"),
+    # both machine-local, see ~/.config/local/fish/config.fish
     set -l out ~/.ssh/config.d/netbox
     set -l tokenfile ~/.config/local/fish/netbox-token
+    # optional per-role / per-host ssh settings, also machine-local (they name users and keys)
+    set -l rolesfile ~/.config/local/fish/netbox-ssh-roles
 
     if test (count $argv) -eq 1; and contains -- $argv[1] help -h --help
         echo "usage: netbox_ssh    rewrite $out from NetBox devices and VMs
 
 needs NETBOX_URL and $tokenfile (Bearer <token>)
-in ~/.config/local/fish/config.fish; ~/.ssh/config must Include config.d/*"
+in ~/.config/local/fish/config.fish; ~/.ssh/config must Include config.d/*
+
+optional $rolesfile adds ssh settings to the generated entries:
+    [role=dns]        sections are role=<netbox role slug> or name=<host>
+    User root         the lines below are ssh_config lines
+    IdentitiesOnly no
+name= lines come before role= lines, so ssh (first value wins) prefers them.
+IdentityAgent is ignored: ~/.ssh/config.d/90-operator-agent owns it."
         return
     end
 
@@ -21,11 +31,14 @@ in ~/.config/local/fish/config.fish; ~/.ssh/config must Include config.d/*"
         echo "netbox_ssh: no token at $tokenfile" >&2
         return 1
     end
-    for tool in curl jq
+    for tool in curl jq awk
         command -q $tool; or begin
             echo "netbox_ssh: $tool is required" >&2
             return 1
         end
+    end
+    if test -r $rolesfile; and string match -qri '^\s*identityagent\b' <$rolesfile
+        echo "netbox_ssh: ignoring IdentityAgent in $rolesfile" >&2
     end
 
     # temp file next to the target so the mv is atomic and a failed run keeps the old file
@@ -42,13 +55,28 @@ in ~/.config/local/fish/config.fish; ~/.ssh/config must Include config.d/*"
             rm -f $tmp
             return 1
         end
-        # the role/site comment is what a grouped picker can key on; names with spaces become dashes
-        echo $json | jq -r '.results[] | select(.status.value == "active" and .primary_ip.address != null)
-            | "\n# role=\(.role.slug // "-") site=\(.site.slug // "-")\nHost \(.name | gsub("[[:space:]]+"; "-"))\n\tHostName \(.primary_ip.address | split("/")[0])"' >>$tmp
+        # name, role, site, ip as tab-separated fields; names with spaces become dashes
+        set -l rows (echo $json | jq -r '.results[]
+            | select(.status.value == "active" and .primary_ip.address != null)
+            | [(.name | gsub("[[:space:]]+"; "-")), (.role.slug // "-"), (.site.slug // "-"),
+               (.primary_ip.address | split("/")[0])] | @tsv')
         or begin
             echo "netbox_ssh: unexpected reply from $endpoint, $out left as it was" >&2
             rm -f $tmp
             return 1
+        end
+
+        for row in $rows
+            set -l f (string split \t -- $row)
+            # the role/site comment is what a grouped picker can key on
+            printf '\n# role=%s site=%s\nHost %s\n\tHostName %s\n' $f[2] $f[3] $f[1] $f[4] >>$tmp
+            if test -r $rolesfile
+                # name= section first, then role=; awk drops IdentityAgent and comments
+                for key in name=$f[1] role=$f[2]
+                    awk -v key="[$key]" '/^\[/ { on = ($0 == key); next }
+                        on && NF && $1 !~ /^#/ && tolower($1) != "identityagent" { print "\t" $0 }' $rolesfile >>$tmp
+                end
+            end
         end
     end
 
