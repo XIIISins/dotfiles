@@ -7,7 +7,15 @@ source $palette
 # bg is -1 (terminal default) so ghostty's background shows through, like nvim.
 # The layout is here too: setting FZF_DEFAULT_OPTS makes fzf.fish skip its own defaults, so
 # every picker (ctrl+s/f/o, fb, fw) shares this one look instead of choosing its own
-set -gx FZF_DEFAULT_OPTS "--cycle --layout=reverse --border --height=60% --preview-window=wrap --marker=* --color=fg:#$tn_fg,bg:-1,hl:#$tn_blue,fg+:#$tn_fg,bg+:#$tn_selection,hl+:#$tn_cyan,info:#$tn_yellow,prompt:#$tn_cyan,pointer:#$tn_cyan,marker:#$tn_green,spinner:#$tn_orange,header:#$tn_orange,border:#$tn_fg_gutter,gutter:-1"
+set -l layout "--cycle --layout=reverse --border --height=60% --preview-window=wrap --marker=*"
+set -gx FZF_DEFAULT_OPTS "$layout --color=fg:#$tn_fg,bg:-1,hl:#$tn_blue,fg+:#$tn_fg,bg+:#$tn_selection,hl+:#$tn_cyan,info:#$tn_yellow,prompt:#$tn_cyan,pointer:#$tn_cyan,marker:#$tn_green,spinner:#$tn_orange,header:#$tn_orange,border:#$tn_fg_gutter,gutter:-1"
+
+# zoxide (zi) passes its own height, info and preview flags on the command line, which beat
+# FZF_DEFAULT_OPTS, so repeat the layout here to keep zi looking like the other pickers
+set -gx _ZO_FZF_OPTS "$layout --info=default --preview-window=right,50%,wrap"
+if type -q eza
+    set -a _ZO_FZF_OPTS "--preview 'eza -T -L1 --color=always {2..}'"
+end
 
 # eza: SGR truecolor per file type and column, only where the default clashes with the palette
 set -l c 38\;2\;
