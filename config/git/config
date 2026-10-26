@@ -14,6 +14,59 @@
 [push]
 	autoSetupRemote = true
 
+[pull]
+	rebase = true
+
+[fetch]
+	prune = true
+
+[rebase]
+	# `git commit --fixup` commits are squashed into place by `git rebase -i`
+	autoSquash = true
+
+[rerere]
+	# a conflict resolved once is resolved the same way next time (rebases, re-merges)
+	enabled = true
+
+[diff]
+	algorithm = histogram
+
+[merge]
+	# conflict markers also show the common ancestor; needs git 2.35+
+	conflictStyle = zdiff3
+
+# delta (brew install git-delta) when it is installed, the stock pager otherwise, so git still
+# works on machines without it. Quoted: an unquoted ; would start a comment
+[core]
+	pager = "if command -v delta >/dev/null 2>&1; then exec delta; else exec less; fi"
+
+[interactive]
+	diffFilter = "if command -v delta >/dev/null 2>&1; then exec delta --color-only; else exec cat; fi"
+
+[delta]
+	navigate = true
+	# skip delta's terminal background query; every terminal here is dark
+	dark = true
+	# TokyoNight Moon: the diff backgrounds come from tokyonight.nvim's delta extra (no palette
+	# equivalent), the rest from config/palette. Hex, since git config has no variables
+	minus-style = syntax "#4b2a3d"
+	minus-non-emph-style = syntax "#4b2a3d"
+	minus-emph-style = syntax "#6b2e43"
+	minus-empty-line-marker-style = syntax "#4b2a3d"
+	plus-style = syntax "#2a4556"
+	plus-non-emph-style = syntax "#2a4556"
+	plus-emph-style = syntax "#305f6f"
+	plus-empty-line-marker-style = syntax "#2a4556"
+	line-numbers-minus-style = "#ff757f"
+	line-numbers-plus-style = "#c3e88d"
+	line-numbers-zero-style = "#3b4261"
+	file-style = "#82aaff" bold
+	file-decoration-style = "#82aaff" ul
+	hunk-header-style = file line-number syntax
+	hunk-header-file-style = "#86e1fc"
+	hunk-header-line-number-style = "#ffc777"
+	hunk-header-decoration-style = "#3b4261" box
+
 # last, so machine-local settings win; a missing file is skipped. config.local is the old place,
 # still read until every machine has moved.
 [include]
