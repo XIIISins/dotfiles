@@ -56,7 +56,8 @@ repo directory so nothing breaks. The backup stays complete.
   `~/.ssh/config` and the files it `Include`s; grouped by the `role=` comment
   `netbox_ssh` writes, or `site=` / `none` via `FZF_SSH_GROUP_BY`). Ctrl+S picks an ssh host too: on an empty
   line it runs `ssh <host>`, otherwise it inserts the host at the cursor
-  (`scp file <C-s>:/tmp`). `netbox_ssh` rewrites `~/.ssh/config.d/netbox`
+  (`scp file <C-s>:/tmp`). Ctrl+G opens zoxide's `zi`, styled like the other pickers via
+  `_ZO_FZF_OPTS` in `conf.d/tool_theme.fish`. `netbox_ssh` rewrites `~/.ssh/config.d/netbox`
   with a `Host` per active NetBox device and VM (primary IP, plus a `role=` /
   `site=` comment); it needs `curl`, `jq`, `NETBOX_URL` and the file
   `~/.config/local/fish/netbox-token` (`Bearer <token>`, mode 600), both
