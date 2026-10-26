@@ -19,3 +19,11 @@ gui:
     cherryPickedCommitBgColor: ["#c099ff"]
     unstagedChangesColor: ["#ff757f"]
     defaultFgColor: ["#c8d3f5"]
+git:
+  # run as GIT_PAGER (through sh): delta when it is installed, plain coloured
+  # git output otherwise, as in config/git/config
+  diffRenderers:
+    - name: delta
+      command: >-
+        if command -v delta >/dev/null 2>&1;
+        then exec delta --dark --paging=never; else exec cat; fi

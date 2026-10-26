@@ -74,8 +74,12 @@ repo directory so nothing breaks. The backup stays complete.
   Hammerspoon at this directory.
 - `karabiner`: Caps Lock to Ctrl and the Aero 75 device entry. Karabiner
   rewrites `karabiner.json` itself, so expect small diffs.
-- `git`: aliases and `push.autoSetupRemote`. Identity, 1Password SSH
-  signing, credentials and per-directory identities (`includeIf`) live in
+- `git`: aliases and defaults (`push.autoSetupRemote`, `pull.rebase`,
+  `fetch.prune`, `rebase.autoSquash`, `rerere`, histogram diffs, `zdiff3`
+  conflict markers, which need git 2.35+).
+  [delta](https://github.com/dandavison/delta) is the pager and the `add -p`
+  filter when it is installed (`brew install git-delta`); without it git falls
+  back to `less`. Identity, 1Password SSH signing, credentials and per-directory identities (`includeIf`) live in
   `~/.config/local/git/config`, included last; see `config.local.example`.
   The old `config.local` is still read. Keep `~/.gitconfig` absent: git
   reads it too, so it would silently add to these settings.
@@ -108,7 +112,7 @@ repo directory so nothing breaks. The backup stays complete.
 - `nvim`: LazyVim. The dashboard header is read from
   `~/.config/local/nvim/dashboard-header.txt` if it exists (see Not
   tracked), otherwise it is the built-in one.
-- `lazygit`: plain config.
+- `lazygit`: renders diffs with delta when it is installed (`git.diffRenderers`).
 
 ## Theming
 
@@ -151,6 +155,10 @@ supply the Ghostty theme.
   the SGR codes.
 - lazygit: `gui.theme` in `config/lazygit/config.yml`, with hex literals
   (lazygit has no variables).
+- delta (git and lazygit diffs): the `[delta]` section of `config/git/config`,
+  hex literals. The diff backgrounds come from tokyonight.nvim's delta extra,
+  since the palette has no blended colours; line numbers and headers use the
+  palette. Syntax colours are bat's default theme (bat has no TokyoNight).
 - btop: `config/btop/themes/tokyonight-moon.theme`. `btop.conf` is untracked
   (btop rewrites it), so pick the theme once in btop (`esc`, Options, Color
   theme).
