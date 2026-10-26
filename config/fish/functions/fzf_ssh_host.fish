@@ -42,7 +42,7 @@ function fzf_ssh_host
         | sort -u \
         | awk -F '\t' '{ g[NR] = $1; h[NR] = $2; if (length($1) > w) w = length($1) }
             END { for (i = 1; i <= NR; i++) printf "%-" w "s  %s\n", g[i], h[i] }' \
-        | fzf --height 40% --reverse --prompt 'ssh> ' \
+        | fzf --prompt 'SSH> ' \
         --preview 'ssh -G {-1} 2>/dev/null | grep -E "^(hostname|user|port|proxyjump|identityfile) "')
     string match -r '\S+$' -- $pick
 end
