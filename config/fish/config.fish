@@ -46,9 +46,6 @@ if type -q fzf
     abbr -a fb fzf_git_branch
     abbr -a fw fzf_git_worktree
     abbr -a fsh fzf_ssh
-    type -q docker; and abbr -a fdk fzf_docker
-    type -q kubectl; and abbr -a fkx fzf_kube
-    type -q systemctl; and abbr -a fsd fzf_systemd
 end
 
 # zoxide (z, zi)
