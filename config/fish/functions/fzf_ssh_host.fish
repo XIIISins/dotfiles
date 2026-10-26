@@ -19,9 +19,30 @@ function fzf_ssh_host
         set i (math $i + 1)
     end
 
-    cat $files 2>/dev/null \
-        | awk 'tolower($1) == "host" { for (i = 2; i <= NF; i++) if ($i !~ /[*?!]/) print $i }' \
+    # group column: the "# role=x site=y" comment netbox_ssh writes above each Host. Pick the
+    # key with FZF_SSH_GROUP_BY (role, site, or none for a plain list); default role.
+    # Hosts without the comment sort under "-"
+    set -l by role
+    set -q FZF_SSH_GROUP_BY; and set by $FZF_SSH_GROUP_BY
+
+    # lines are group<TAB>host, sorted so a group stays together, then padded to the widest
+    # group (awk, as a tab stop is too narrow for long roles). fzf shows both; the host is the
+    # last word, which is what we print. Hosts have no spaces
+    set -l pick (cat $files 2>/dev/null \
+        | awk -v by=$by '
+            by != "none" && match($0, "^[ \t]*#.*[ \t]" by "=[^ \t]+") {
+                grp = substr($0, RSTART, RLENGTH)
+                sub(".*" by "=", "", grp)
+                next
+            }
+            tolower($1) == "host" {
+                for (i = 2; i <= NF; i++) if ($i !~ /[*?!]/) print (by == "none" ? "" : (grp == "" ? "-" : grp)) "\t" $i
+                grp = ""
+            }' \
         | sort -u \
+        | awk -F '\t' '{ g[NR] = $1; h[NR] = $2; if (length($1) > w) w = length($1) }
+            END { for (i = 1; i <= NR; i++) printf "%-" w "s  %s\n", g[i], h[i] }' \
         | fzf --height 40% --reverse --prompt 'ssh> ' \
-        --preview 'ssh -G {} | grep -E "^(hostname|user|port|proxyjump|identityfile) "'
+        --preview 'ssh -G {-1} 2>/dev/null | grep -E "^(hostname|user|port|proxyjump|identityfile) "')
+    string match -r '\S+$' -- $pick
 end
