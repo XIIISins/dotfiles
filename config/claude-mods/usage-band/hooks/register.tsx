@@ -20,7 +20,8 @@ const RED = '#ff757f'
 const BRANCH = ''
 const ARROW = ''
 const ARROW_LEFT = ''
-const SEGMENT_BG = [FG_GUTTER, BG_HIGHLIGHT]
+// a function, not an array: indexing one gives string | undefined under noUncheckedIndexedAccess
+const segmentBg = (i: number) => (i % 2 === 0 ? FG_GUTTER : BG_HIGHLIGHT)
 
 type Part = readonly [text: string, color: string]
 
@@ -121,13 +122,13 @@ export const register: Register = on => {
 		}
 
 		const left: Cell[] = gauges.flatMap((parts, i) => {
-			const bg = SEGMENT_BG[i % 2]
+			const bg = segmentBg(i)
 			const last = i === gauges.length - 1
 			return [
 				{ text: ' ', fg: FG_DARK, bg },
 				...parts.map(([text, fg]) => ({ text, fg, bg })),
 				{ text: ' ', fg: FG_DARK, bg },
-				{ text: ARROW, fg: bg, bg: last ? undefined : SEGMENT_BG[(i + 1) % 2] },
+				{ text: ARROW, fg: bg, bg: last ? undefined : segmentBg(i + 1) },
 			]
 		})
 
@@ -146,7 +147,7 @@ export const register: Register = on => {
 		return (
 			<Box>
 				{[...left, ...right].map(({ text, fg, bg }, i) => (
-					<Text key={i} color={fg} backgroundColor={bg}>
+					<Text key={String(i)} color={fg} backgroundColor={bg}>
 						{text}
 					</Text>
 				))}
