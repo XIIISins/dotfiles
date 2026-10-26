@@ -55,7 +55,11 @@ repo directory so nothing breaks. The backup stays complete.
   each: `fb` git branch, `fw` git worktree, `fsh` ssh host (from
   `~/.ssh/config` and the files it `Include`s). Ctrl+S picks an ssh host too: on an empty
   line it runs `ssh <host>`, otherwise it inserts the host at the cursor
-  (`scp file <C-s>:/tmp`).
+  (`scp file <C-s>:/tmp`). `netbox_ssh` rewrites `~/.ssh/config.d/netbox`
+  with a `Host` per active NetBox device and VM (primary IP, plus a `role=` /
+  `site=` comment); it needs `curl`, `jq`, `NETBOX_URL` and the file
+  `~/.config/local/fish/netbox-token` (`Bearer <token>`, mode 600), both
+  machine-local.
 - `tmux`: plugins are installed by tpm; `tmux.conf` clones tpm and installs
   them on a fresh machine (needs git). `notify.sh` is the notch-style
   notification popup. `layouts.sh` is the named layout selector (prefix `a`
