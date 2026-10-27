@@ -1,0 +1,93 @@
+#!/bin/sh
+# Build teams-cli in the palette colours and install it as `teams` in ~/.local/bin.
+#
+#   ./build-themed [version]   build tag v<version> (default: the newest release)
+#
+# teams-cli has no theme setting: its TUI colours are Color::Rgb literals in src/tui.rs.
+# This swaps each one for a palette colour (palette/out/tokyonight-moon.sh) and builds
+# with cargo, so re-run it after every teams-cli update. It fails instead of half
+# theming when upstream adds or changes a colour; extend the map below then.
+# Needs git and cargo (`brew install rust`), and not the pipx install (same binary name).
+
+set -eu
+
+case ${1:-} in
+    -h | --help) sed -n '2,/^$/p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+esac
+
+dir=$(cd "$(dirname "$0")" && pwd -P)
+upstream=https://github.com/rvben/teams-cli
+. "$dir/../palette/out/tokyonight-moon.sh"
+
+# upstream colour -> palette name; several upstream shades collapse into one
+map='
+222,225,240 FG
+242,243,252 FG
+15,16,28 BG
+24,26,44 BG_DARK
+30,33,60 BG_HIGHLIGHT
+50,54,86 FG_GUTTER
+128,134,168 FG_DARK
+150,156,190 FG_DARK
+123,131,235 BLUE
+155,162,255 BLUE
+170,177,255 BLUE
+246,183,82 YELLOW
+255,128,112 ORANGE
+255,126,119 RED
+110,220,170 GREEN
+122,200,255 CYAN
+240,160,220 RED
+130,220,160 GREEN
+250,200,110 YELLOW
+190,160,255 MAGENTA
+110,215,210 ORANGE
+'
+
+for tool in git cargo; do
+    if ! command -v "$tool" >/dev/null 2>&1; then
+        echo "build-themed: needs $tool" >&2
+        exit 1
+    fi
+done
+if command -v pipx >/dev/null 2>&1 && pipx list --short 2>/dev/null | grep -q '^teams-cli '; then
+    echo "build-themed: teams-cli is installed with pipx too; run: pipx uninstall teams-cli" >&2
+    exit 1
+fi
+
+ver=${1:-$(git ls-remote --tags --refs --sort=-v:refname "$upstream" 'v*' | sed -n '1s|.*refs/tags/v||p')}
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+git clone -q -c advice.detachedHead=false --depth 1 --branch "v$ver" "$upstream" "$work/src"
+tui=$work/src/src/tui.rs
+
+# one sed substitution per mapped colour; source writes them as `Color::Rgb(r, g, b)`
+: >"$work/theme.sed"
+: >"$work/palette"
+while read -r from name; do
+    [ -n "$from" ] || continue
+    old=$(echo "$from" | sed 's/,/, /g')
+    eval "new=\$TN_${name}_RGB"
+    new=$(echo "$new" | sed 's/;/, /g')
+    if ! grep -qF "Color::Rgb($old)" "$tui"; then
+        echo "build-themed: Color::Rgb($old) is gone from v$ver; update the map" >&2
+        exit 1
+    fi
+    echo "s/Color::Rgb($old)/Color::Rgb($new)/g" >>"$work/theme.sed"
+    echo "Color::Rgb($new)" >>"$work/palette"
+done <<EOF
+$map
+EOF
+sed -f "$work/theme.sed" "$tui" >"$work/tui.rs"
+mv "$work/tui.rs" "$tui"
+
+# anything left that is not a palette colour is new upstream
+left=$(grep -o 'Color::Rgb([^)]*)' "$tui" | sort -u | grep -vxF -f "$work/palette" || true)
+if [ -n "$left" ]; then
+    echo "build-themed: unmapped colours in v$ver, add them to the map:" >&2
+    echo "$left" >&2
+    exit 1
+fi
+
+cargo install --locked --force --root "$HOME/.local" --path "$work/src"
+echo "teams $ver installed in the palette colours"
