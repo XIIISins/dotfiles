@@ -66,7 +66,9 @@ repo directory so nothing breaks. The backup stays complete.
   `IdentitiesOnly`, ...) to the matching entries, and a bare `Skip` leaves
   the host out; see `netbox_ssh help`. `workproxy [start|stop|status]` runs a
   SOCKS5 proxy on `localhost:1080` (`WORKPROXY_PORT`) through the work laptop
-  for reaching internal pages while WFH; it needs the machine-local ssh host
+  for reaching internal pages while WFH, and forwards the laptop's
+  `localhost:8080` (`WORKPROXY_PORTS`, the startpage) to the same local port;
+  it needs the machine-local ssh host
   `workproxy` in `~/.ssh/config.d/workproxy` (`HostName`, `User`) and Remote
   Login on the laptop.
 - `tmux`: plugins are installed by tpm; `tmux.conf` clones tpm and installs
