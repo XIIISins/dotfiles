@@ -1,0 +1,33 @@
+diff --git a/src/desktop/macos.rs b/src/desktop/macos.rs
+index 919fe8e..0a2b408 100644
+--- a/src/desktop/macos.rs
++++ b/src/desktop/macos.rs
+@@ -135,11 +135,12 @@ fn parse_processes(text: &str) -> Result<HashMap<u32, Process>, AppError> {
+             let mut number = || {
+                 let (value, tail) = rest.split_once(char::is_whitespace).ok_or_else(invalid)?;
+                 rest = tail.trim_start();
+-                value.parse::<u32>().map_err(|_| invalid())
++                value.parse::<i64>().map_err(|_| invalid())
+             };
+-            let pid = number()?;
+-            let uid = number()?;
+-            let parent = number()?;
++            let pid = u32::try_from(number()?).map_err(|_| invalid())?;
++            // ps prints uids signed, so nobody (4294967294) shows as -2
++            let uid = number()? as u32;
++            let parent = u32::try_from(number()?).map_err(|_| invalid())?;
+             if rest.is_empty() {
+                 return Err(invalid());
+             }
+@@ -202,8 +203,10 @@ mod tests {
+         assert!(!teams_owner(&processes, 30, 501, &installed));
+         processes.get_mut(&20).unwrap().parent = 30;
+         assert!(!teams_owner(&processes, 30, 501, &installed));
+-        for malformed in ["oops", "1 501 x /Teams", "1 501 0 "] {
++        for malformed in ["oops", "1 501 x /Teams", "1 501 0 ", "-1 501 0 /Teams"] {
+             assert!(parse_processes(malformed).is_err());
+         }
++        let processes = parse_processes("  630    -2     1 /usr/libexec/dhcp6d\n").unwrap();
++        assert_eq!(processes[&630].uid, 4294967294);
+     }
+ }

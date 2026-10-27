@@ -7,6 +7,8 @@
 # This swaps each one for a palette colour (palette/out/tokyonight-moon.sh) and builds
 # with cargo, so re-run it after every teams-cli update. It fails instead of half
 # theming when upstream adds or changes a colour; extend the map below then.
+# Bug fixes not yet upstream live in patches/ and are applied first; a patch that
+# no longer applies was most likely fixed upstream, so check and delete it.
 # Needs git and cargo (`brew install rust`), and not the pipx install (same binary name).
 
 set -eu
@@ -60,6 +62,14 @@ work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 git clone -q -c advice.detachedHead=false --depth 1 --branch "v$ver" "$upstream" "$work/src"
 tui=$work/src/src/tui.rs
+
+for patch in "$dir"/patches/*.patch; do
+    [ -e "$patch" ] || continue
+    if ! git -C "$work/src" apply "$patch"; then
+        echo "build-themed: $(basename "$patch") does not apply to v$ver; fixed upstream?" >&2
+        exit 1
+    fi
+done
 
 # one sed substitution per mapped colour; source writes them as `Color::Rgb(r, g, b)`
 : >"$work/theme.sed"
