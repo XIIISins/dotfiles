@@ -124,6 +124,9 @@ repo directory so nothing breaks. The backup stays complete.
   `~/.config/local/nvim/dashboard-header.txt` if it exists (see Not
   tracked), otherwise it is the built-in one.
 - `lazygit`: renders diffs with delta when it is installed (`git.diffRenderers`).
+- `teams`: [teams-cli](https://github.com/rvben/teams-cli), Microsoft Teams
+  chats in the terminal. Only `build-themed` is tracked (see Theming);
+  `config.toml` is written by `teams init` per machine.
 
 ## Theming
 
@@ -176,6 +179,12 @@ supply the Ghostty theme.
 - btop: `config/btop/themes/tokyonight-moon.theme`. `btop.conf` is untracked
   (btop rewrites it), so pick the theme once in btop (`esc`, Options, Color
   theme).
+- teams-cli: no theme setting (its TUI colours are `Color::Rgb` literals), so
+  `config/teams/build-themed [version]` clones a release, swaps each colour
+  for its palette value from `palette/out/tokyonight-moon.sh` and installs it
+  with cargo (`brew install rust`) into `~/.local/bin`, in place of the pipx
+  install. Re-run it after each teams-cli release; it stops when upstream
+  adds or changes a colour, so extend its map then.
 - Obsidian: `render` writes `out/tokyonight-moon-obsidian.css`, a
   self-contained snippet. `./install.sh hooks palette` copies it into the
   `.obsidian/snippets/` of every vault Obsidian lists (macOS, needs `jq`);

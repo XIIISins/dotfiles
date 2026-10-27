@@ -21,7 +21,7 @@ os=$(uname -s)
 dry=0
 server=0
 
-packages="fish tmux ghostty hammerspoon karabiner nvim lazygit git palette claude-mods fastfetch zen btop spicetify bat"
+packages="fish tmux ghostty hammerspoon karabiner nvim lazygit git palette claude-mods fastfetch zen btop spicetify bat teams"
 
 # packages that only make sense on one OS (uname -s); empty means everywhere
 only_on() {
@@ -41,6 +41,7 @@ local_paths() {
         git) echo "config.local" ;;
         btop) echo "btop.conf" ;;
         spicetify) echo "config-xpui.ini" ;;
+        teams) echo "config.toml" ;;
     esac
 }
 

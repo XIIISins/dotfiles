@@ -8,6 +8,8 @@ config/karabiner/automatic_backups/
 config/btop/btop.conf
 # spicetify rewrites its settings (backup version, current theme) itself; only the theme is tracked
 config/spicetify/config-xpui.ini
+# teams init writes the profile (backend, client id, tenant) per machine; only the build script is tracked
+config/teams/config.toml
 
 # old places for machine-local settings, still read until every machine uses ~/.config/local
 config/fish/config-local.fish
