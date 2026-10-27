@@ -64,7 +64,11 @@ repo directory so nothing breaks. The backup stays complete.
   machine-local. An optional `~/.config/local/fish/netbox-ssh-roles` adds
   ssh settings (`[role=dns]` or `[name=host]` sections of `User`,
   `IdentitiesOnly`, ...) to the matching entries, and a bare `Skip` leaves
-  the host out; see `netbox_ssh help`.
+  the host out; see `netbox_ssh help`. `workproxy [start|stop|status]` runs a
+  SOCKS5 proxy on `localhost:1080` (`WORKPROXY_PORT`) through the work laptop
+  for reaching internal pages while WFH; it needs the machine-local ssh host
+  `workproxy` in `~/.ssh/config.d/workproxy` (`HostName`, `User`) and Remote
+  Login on the laptop.
 - `tmux`: plugins are installed by tpm; `tmux.conf` clones tpm and installs
   them on a fresh machine (needs git). `notify.sh` is the notch-style
   notification popup. `layouts.sh` is the named layout selector (prefix `a`
