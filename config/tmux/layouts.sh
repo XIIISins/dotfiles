@@ -12,6 +12,10 @@
 self=$0
 dir=$(dirname "$0")
 file=${LAYOUTS_FILE:-$dir/layouts}
+logfile=${XDG_CACHE_HOME:-$HOME/.cache}/tmux-layouts.log
+
+# one line per apply and per failed step, to find out why a layout did not apply
+log() { printf '%s %s\n' "$(date '+%F %T')" "$*" >>"$logfile" 2>/dev/null; }
 
 # the message goes through run-shell's sh, so close and reopen the quote around any '
 say() {
@@ -41,15 +45,16 @@ apply() {
     [ -n "$line" ] || { say "No layout $name"; return 1; }
     want=$(printf '%s' "$line" | cut -f2)
     layout=$(printf '%s' "$line" | cut -f3-)
-    have=$(tmux display -p -t "$win" '#{window_panes}')
+    have=$(tmux display -p -t "$win" '#{window_panes}' 2>&1)
+    log "apply win=$win name=$name want=$want have=$have"
 
     # fewer panes than the layout: open the missing ones in the active pane's directory,
     # re-tiling in between so the next split always has room
     if [ "$have" -lt "$want" ]; then
         cwd=$(tmux display -p -t "$win" '#{pane_current_path}')
         while [ "$have" -lt "$want" ]; do
-            tmux split-window -d -t "$win" -c "$cwd" && tmux select-layout -t "$win" tiled ||
-                { say "No room for $want panes"; return 1; }
+            err=$(tmux split-window -d -t "$win" -c "$cwd" 2>&1 && tmux select-layout -t "$win" tiled 2>&1) ||
+                { log "split failed: $err"; say "No room for $want panes"; return 1; }
             have=$((have + 1))
         done
     fi
@@ -71,6 +76,7 @@ apply() {
     if err=$(tmux select-layout -t "$win" "$layout" 2>&1); then
         say "Layout $name"
     else
+        log "select-layout failed: $err (window layout: $(tmux display -p -t "$win" '#{window_layout}' 2>&1))"
         say "Layout $name: $err"
     fi
 }
@@ -105,6 +111,7 @@ pick() {
     choice=$(list "$win" | eval fzf "$opts" --delimiter "'\t'" --with-nth 2 \
         --header "'enter apply   ctrl-x delete'" \
         --bind "'ctrl-x:execute-silent($self delete {1})+reload($self list $win)'" | cut -f1)
+    log "pick win=$win choice=$choice"
     [ -n "$choice" ] && apply "$win" "$choice"
 }
 
