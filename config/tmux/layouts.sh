@@ -106,6 +106,12 @@ delete() {
 
 pick() {
     win=$1
+    # the key binding's '#{window_id}' has reached us unexpanded (the log showed it literally),
+    # so ask tmux for the client's current window instead
+    case $win in
+    @*) ;;
+    *) win=$(tmux display -p '#{window_id}') ;;
+    esac
     # TN_* colours as fzf flags come from theme.conf
     opts=$(tmux show -gqv @layouts-fzf-options)
     choice=$(list "$win" | eval fzf "$opts" --delimiter "'\t'" --with-nth 2 \
