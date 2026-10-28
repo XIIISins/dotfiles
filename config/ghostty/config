@@ -23,6 +23,8 @@ window-theme = ghostty
 
 ## MacOS specific
 macos-titlebar-style = "transparent"
+# left Option sends Alt (nvim <M-…> keys); right Option still types €, ë, …
+macos-option-as-alt = left
 # macos-icon = xray
 
 
