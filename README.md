@@ -266,8 +266,10 @@ Extra values in the palette file that are not in the base palette (used by tmux 
   public repo: `fish/config.fish`, `git/config` (identity, signing,
   credentials), `tmux/tmux.conf` (sourced before tpm runs, so it can add
   `@plugin` lines), `ghostty/config` (loaded after the tracked config, so it
-  wins) and `nvim/dashboard-header.txt` (e.g. a work banner). For ssh, keep
-  per-host files in `ssh/` and add `Include ~/.config/local/ssh/*` to
+  wins), `nvim/dashboard-header.txt` (e.g. a work banner) and
+  `hammerspoon/init.lua` (returns a settings table, e.g.
+  `{ window_focus = false }` where a window manager owns Cmd+Ctrl+h/j/k/l).
+  For ssh, keep per-host files in `ssh/` and add `Include ~/.config/local/ssh/*` to
   `~/.ssh/config` (not tracked); `fzf_ssh_host` follows the Include. It is
   not a package, so `install.sh` never links or backs it up; create it by
   hand. `fish/config-local.fish` and `git/config.local` in the repo are the
