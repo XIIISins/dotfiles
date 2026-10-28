@@ -1,6 +1,18 @@
 return {
 	{ "folke/flash.nvim", enabled = false },
 
+	-- which-key only auto-waits on g/z among single letters; without this a pause after
+	-- `s` times out (timeoutlen) and runs the builtin `s`, dropping into insert mode
+	{
+		"folke/which-key.nvim",
+		opts = {
+			triggers = {
+				{ "<auto>", mode = "nxso" },
+				{ "s", mode = "n" },
+			},
+		},
+	},
+
 	{
 		"brenoprata10/nvim-highlight-colors",
 		event = "BufReadPre",
